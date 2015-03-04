@@ -8,6 +8,7 @@ SIZE = 120
 obj_big = 30
 obj_small = 120
 obj_large = 5
+##Random Konstants
 WOOD_SIZE = [101, 152, 210, 253]
 WoodSizeSmall = [24, 13, 18, 26]
 MuntainSize = [102, 124, 87]
@@ -15,6 +16,7 @@ SEA_SIZE = [37, 64, 144, 179]
 SeaSizeSmall = [30, 68, 40, 54]
 RiverSizeSmall = [27, 19, 17, 23]
 RiverSize = [34, 49, 27, 40]
+###
 ##amount##
 grass = '`'
 swamp = ';'
@@ -31,11 +33,14 @@ chances["^"] = [0.1, 0.2, 0.5]
 chances["T"] = [0.9, 0.8, 0.86, 0.6]
 #chances["^"] = 
 chance = [ 0.3, 0.5, 0.8, 0.9, 1, 1.1, 1.2, 2.5, 1.5, 2, 1.75, 3.3]
+
+
 class square:
     def __init__(self, typ):
         self.c = typ if typ != 0 else  ''
         self.t = 'ground'
-
+        self.high = 0
+        self.atributes = []
         if typ == 'T':
             self.t = 'tree'
         elif typ == 'S':
@@ -46,6 +51,8 @@ class square:
             self.t = "ice-berg"
     def __str__(self):
         return str(self.c)
+
+
 ##colors##
 color = {}
 color["T"] = '42'
@@ -56,7 +63,9 @@ color[swamp] = '2;32;40'
 color[meadle] = '7;92'
 color[grass] = '1;30;102'
 ##
+
 def generate_sea_first(arr, i, j):
+    SIZE = len(arr)
     if not (0 <= i < len(arr) and 0 <= j < len(arr[0])):
         return 0
     elif arr[i][j].c != '':
@@ -84,7 +93,9 @@ def generate_sea_first(arr, i, j):
         if random() < 0.1 and i < SIZE - 1 and arr[i + 1][j].c == '':
             arr[i + 1][j] = square(simple)
 
-def generate(arr, i, j, t, am=0):
+
+def generate(arr, i, j, t, flag=0):
+    SIZE = len(arr)
     if not(0 <= i < SIZE and 0 <= j < SIZE):
         return 0
         
@@ -92,7 +103,7 @@ def generate(arr, i, j, t, am=0):
         q = [(i, j)]
         index = 0
         if t.t == 'tree':
-            if am == 0:
+            if flag == 0:
                 size = choice(WOOD_SIZE)
         
             else:
@@ -114,7 +125,7 @@ def generate(arr, i, j, t, am=0):
 
         q = [(i, j)]
         index = 0
-        if am == 0:
+        if flag == 0:
             size = choice(SEA_SIZE)
         else:
             size = choice(SeaSizeSmall)
@@ -131,7 +142,7 @@ def generate(arr, i, j, t, am=0):
     elif t.t == 'water river':
         index = 0
         q = [(i, j)]
-        if am == 0:
+        if flag == 0:
             
             size = choice(RiverSize)
         else:
@@ -160,9 +171,18 @@ def generate(arr, i, j, t, am=0):
             if index % 29 == 0:
                 shuffle(q)
             index += 1
+
+
 class terra:
-    def __init__(self):
+    def __init__(self, SIZE):
+        global obj_small
+        obj_small = int(SIZE ** (1.5))
+        global obj_big
+        obj_big = SIZE // 2;
+        global obj_large
+        obj_large = int(SIZE ** 0.5)
         self.area = [[square(0)] * SIZE for i in range(SIZE)]
+        
         self.t = 25
         for i in range(SIZE):
             for j in range(SIZE):
@@ -172,22 +192,26 @@ class terra:
             for j in range(SIZE):
                 if self.area[i][j].c == '':
                     self.area[i][j] = square('"')
-        for i in range(obj_large):
-            i, j = randint(0, SIZE - 1), randint(0, SIZE - 1)
-            generate(self.area, i, j, square(choice([swamp, meadle, grass])))
+        
         for i in range(obj_big):
             i, j = randint(10, SIZE - 10), randint(10, SIZE - 10)
             generate(self.area, i, j, square(choice(['S', '~', 'T'])))
+        for i in range(obj_large):
+            i, j = randint(0, SIZE - 1), randint(0, SIZE - 1)
+            generate(self.area, i, j, square(choice([swamp, meadle, grass])))
         for i in range(obj_small):
             i, j = randint(10, SIZE - 10), randint(10, SIZE - 10)
             generate(self.area, i, j, square(choice(['S', '~', 'T'])), 1)
-    def __str__(self):
-        for i in range(SIZE):
-            for j in range(SIZE):
+
+    def Print(self, x1=0, y1=0, x2=SIZE, y2=SIZE):
+        for i in range(x1, x2):
+            for j in range(y1, y2):
 #                print(str(self.area[i][j]), end='')
                 print("\033[" + color[str(self.area[i][j])] + "m" + str(self.area[i][j]) + "\033[0m", end='')
             print()
         return '\n'
             
-world = terra()
-print(world)
+world = terra(int(input()))
+while True:
+    a, b, c, d = map(int, input().split())
+    world.Print(a, b, c, d)
