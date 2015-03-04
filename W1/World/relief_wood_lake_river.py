@@ -26,7 +26,7 @@ swamp = ';'
 meadle = ':'
 simple = '"'
 
-sea = 'S'
+sea = chr(8776)
 moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, -1), (-1, 1), (-1, -1), (1, 1)]
 types = ['`', '"', '"', '"', '"', '"', '"', '"',  "S", "T", '~', 'S', '~', "^"]
 
@@ -34,6 +34,7 @@ types = ['`', '"', '"', '"', '"', '"', '"', '"',  "S", "T", '~', 'S', '~', "^"]
 chances = {}
 chances["~"] = [0.6, 0.7, 0.3]
 chances["^"] = [0.1, 0.2, 0.5]
+
 chances["T"] = [0.9, 0.8, 0.86, 0.6]
 #chances["^"] = 
 chance = [ 0.3, 0.5, 0.8, 0.9, 1, 1.1, 1.2, 2.5, 1.5, 2, 1.75, 3.3]
@@ -48,6 +49,8 @@ class square:
         self.atributes = []
         if typ == 'T':
             self.t = 'tree'
+        elif typ == chr(8776):
+            self.t = "sea water"
         elif typ == 'S':
             self.t = "water lake"
         elif typ == '~':
@@ -66,6 +69,7 @@ color["T"] = ["T",'', "black", 0, "green", 0, []]
 color['"'] = ['"', '', "gray", 1, "yellow", 0, []]
 color["S"] = ["S", '', "dark_blue", 1, "dark_blue", 0, ["blinked"]]
 color["~"] = ["~", '', "dark_blue", 1, "light_blue", 0, ["blinked"]]
+color[sea] = [sea, '', 'dark_blue', 0, "dark_blue", 1, ["blinked"]]
 color[swamp] = [swamp, '', "purpur", 0, "green", 1, ["inverse"]]
 color[meadle] = [meadle, '', "green", 0, "green", 1, ["light"]]
 color[grass] = [grass, '', "yellow", 0, "green", 1, ["hard"]]
@@ -182,6 +186,11 @@ def generate(arr, i, j, t, flag=0):
 
 class terra:
     def __init__(self, SIZE):
+    ##
+        if type(SIZE) == list:
+            self.area = SIZE
+            return 
+   ##
         global obj_small
         obj_small = int(SIZE ** (1.5) // 10)
         global obj_big
@@ -226,5 +235,5 @@ print("New World is created\n")
 while True:
     s = input()
     if len(s) != 0:
-        a, b, c, d = map(int, input().split())
+        a, b, c, d = map(int, s.split())
         world.Print(a, b, c, d)

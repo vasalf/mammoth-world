@@ -21,7 +21,7 @@ def colored_print(string, end='', color="black", version=0, bg = "gray", version
     for c in special:
         col += str(__specials__[c]) + ';'
     col += str(__colors__[color] + 60 * version) + ';'
-    col += str(10 + __colors__[bg] + 60 * version)
+    col += str(10 + __colors__[bg] + 60 * version_back)
     res.append(col)
     res.append('m')
     res.append(string)
