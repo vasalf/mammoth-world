@@ -11,8 +11,8 @@ obj_small = 120
 obj_large = 5
 ##Random Konstants
 WOOD_SIZE = [101, 152, 210, 253]
-WoodSizeSmall = [24, 13, 18, 26]
-MuntainSize = [102, 124, 87]
+WoodSizeSmall = [91, 103, 95, 88, 127]
+MountainSize = [102, 124, 87]
 SEA_SIZE = [37, 64, 144, 179]
 SeaSizeSmall = [30, 68, 40, 54]
 RiverSizeSmall = [27, 19, 17, 23]
@@ -65,10 +65,10 @@ color = {}
 color["T"] = ["T",'', "black", 0, "green", 0, []]
 color['"'] = ['"', '', "gray", 1, "yellow", 0, []]
 color["S"] = ["S", '', "dark_blue", 1, "dark_blue", 0, ["blinked"]]
-color["~"] = ["~", '', "dark_blue", 1, "dark_blue", 0, ["blinked", "inverse"]]
+color["~"] = ["~", '', "dark_blue", 1, "light_blue", 0, ["blinked"]]
 color[swamp] = [swamp, '', "purpur", 0, "green", 1, ["inverse"]]
-color[meadle] = [meadle, '', "green", 0, "green", 1, []]
-color[grass] = [grass, '', "yellow", 0, "green", 1, []]
+color[meadle] = [meadle, '', "green", 0, "green", 1, ["light"]]
+color[grass] = [grass, '', "yellow", 0, "green", 1, ["hard"]]
 ##
 
 
@@ -224,5 +224,7 @@ print("\033[31mType Size of the World\033[0m\n")
 world = terra(int(input()))
 print("New World is created\n")
 while True:
-    a, b, c, d = map(int, input().split())
-    world.Print(a, b, c, d)
+    s = input()
+    if len(s) != 0:
+        a, b, c, d = map(int, input().split())
+        world.Print(a, b, c, d)
