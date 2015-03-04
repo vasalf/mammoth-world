@@ -5,7 +5,7 @@ from math import sqrt
 import sys
 
 sys.setrecursionlimit(100000)
-SIZE = 120
+SIZE = 80
 obj_big = 30
 obj_small = 120
 obj_large = 5
@@ -17,13 +17,10 @@ SEA_SIZE = [37, 64, 144, 179]
 SeaSizeSmall = [30, 68, 40, 54]
 RiverSizeSmall = [27, 19, 17, 23]
 RiverSize = [34, 49, 27, 40]
-<<<<<<< HEAD
 ###
 ##amount##
-=======
 
 # amount #
->>>>>>> refs/remotes/origin/master
 grass = '`'
 swamp = ';'
 meadle = ':'
@@ -38,12 +35,9 @@ chances = {}
 chances["~"] = [0.6, 0.7, 0.3]
 chances["^"] = [0.1, 0.2, 0.5]
 chances["T"] = [0.9, 0.8, 0.86, 0.6]
-<<<<<<< HEAD
 #chances["^"] = 
 chance = [ 0.3, 0.5, 0.8, 0.9, 1, 1.1, 1.2, 2.5, 1.5, 2, 1.75, 3.3]
-=======
 chance = [0.3, 0.5, 0.8, 0.9, 1, 1.1, 1.2, 2.5, 1.5, 2, 1.75, 3.3]
->>>>>>> refs/remotes/origin/master
 
 
 class square:
@@ -65,11 +59,8 @@ class square:
         return str(self.c)
 
 
-<<<<<<< HEAD
 ##colors##
-=======
 # colors #
->>>>>>> refs/remotes/origin/master
 color = {}
 color["T"] = '42'
 color['"'] = '57;103'
@@ -78,11 +69,8 @@ color["~"] = '5;94;44'
 color[swamp] = '2;32;40'
 color[meadle] = '7;92'
 color[grass] = '1;30;102'
-<<<<<<< HEAD
 ##
-=======
 
->>>>>>> refs/remotes/origin/master
 
 def generate_sea_first(arr, i, j):
     SIZE = len(arr)
@@ -114,12 +102,8 @@ def generate_sea_first(arr, i, j):
             arr[i + 1][j] = square(simple)
 
 
-<<<<<<< HEAD
 def generate(arr, i, j, t, flag=0):
     SIZE = len(arr)
-=======
-def generate(arr, i, j, t, am=0):
->>>>>>> refs/remotes/origin/master
     if not(0 <= i < SIZE and 0 <= j < SIZE):
         return 0
 
@@ -129,7 +113,6 @@ def generate(arr, i, j, t, am=0):
         if t.t == 'tree':
             if flag == 0:
                 size = choice(WOOD_SIZE)
-
             else:
                 size = choice(WoodSizeSmall)
         else:
@@ -162,18 +145,13 @@ def generate(arr, i, j, t, am=0):
                 if 0 <= i + dx < SIZE and 0 <= j + dy < SIZE:
                     if random() < 0.76:
                         q.append((i + dx, j + dy))
-                        if index % 7 == 0:
-                            shuffle(q)
+            if index % 7 == 0:
+                shuffle(q)
             index += 1
     elif t.t == 'water river':
         index = 0
         q = [(i, j)]
-<<<<<<< HEAD
         if flag == 0:
-            
-=======
-        if am == 0:
->>>>>>> refs/remotes/origin/master
             size = choice(RiverSize)
         else:
             size = choice(RiverSizeSmall)
@@ -205,11 +183,11 @@ def generate(arr, i, j, t, am=0):
 class terra:
     def __init__(self, SIZE):
         global obj_small
-        obj_small = int(SIZE ** (1.5))
+        obj_small = int(SIZE ** (1.5) // 10)
         global obj_big
-        obj_big = SIZE // 2;
+        obj_big = SIZE // 5
         global obj_large
-        obj_large = int(SIZE ** 0.5)
+        obj_large = int(SIZE ** 0.5 / 2)
         self.area = [[square(0)] * SIZE for i in range(SIZE)]
         
         self.t = 25
@@ -233,29 +211,18 @@ class terra:
             i, j = randint(10, SIZE - 10), randint(10, SIZE - 10)
             generate(self.area, i, j, square(choice(['S', '~', 'T'])), 1)
 
-<<<<<<< HEAD
     def Print(self, x1=0, y1=0, x2=SIZE, y2=SIZE):
         for i in range(x1, x2):
             for j in range(y1, y2):
 #                print(str(self.area[i][j]), end='')
                 print("\033[" + color[str(self.area[i][j])] + "m" + str(self.area[i][j]) + "\033[0m", end='')
             print()
+        print("\n\n\n\n\n\n")
         return '\n'
             
+print("\033[31mType Size of the World\033[0m\n")
 world = terra(int(input()))
+print("New World is created\n")
 while True:
     a, b, c, d = map(int, input().split())
     world.Print(a, b, c, d)
-=======
-    def __str__(self):
-        for i in range(SIZE):
-            for j in range(SIZE):
-                print("\033[" + color[str(self.area[i][j])] + "m" +
-                      str(self.area[i][j]) + "\033[0m", end='')
-            print()
-        return '\n'
-
-
-world = terra()
-print(world)
->>>>>>> refs/remotes/origin/master
