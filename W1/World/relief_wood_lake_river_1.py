@@ -47,7 +47,7 @@ class square:
     def __init__(self, typ):
         self.c = typ if typ != 0 else ''
         self.t = 'ground'
-        self.high = 0
+        self.height = 0
         self.atributes = []
         if typ == 'T':
             self.t = 'tree'
@@ -72,8 +72,8 @@ color = {}
 color["T"] = ["T",'', "black", 0, "green", 0, []]
 color['"'] = ['"', '', "gray", 1, "yellow", 1, []]
 color["S"] = ["S", '', "dark_blue", 1, "dark_blue", 0, ["blinked"]]
-color["~"] = ["~", '', "dark_blue", 1, "light_blue", 0, ["blinked"]]
-color[sea] = [sea, '', 'dark_blue', 1, "dark_blue", 1, ["blinked"]]
+color["~"] = ["~", '', "dark_blue", 1, "light_blue", 0, ["blinked", "inverse"]]
+color[sea] = [sea, '', 'dark_blue', 1, "dark_blue", 0, ["blinked"]]
 color[swamp] = [swamp, '', "purpur", 0, "green", 1, ["inverse"]]
 color[meadle] = [meadle, '', "green", 0, "green", 1, ["light"]]
 color[grass] = [grass, '', "yellow", 0, "green", 1, ["hard"]]
@@ -162,7 +162,9 @@ def generate(arr, i, j, t, flag=0):
     elif t.t == 'water river' or t.t == 'mountain':
         index = 0
         q = [(i, j)]
+        height = randint(5000, 10000)
         if t.t == 'water river':
+            
             if flag == 0:
                 size = choice(RiverSize)
             else:
@@ -183,7 +185,12 @@ def generate(arr, i, j, t, flag=0):
             i, j = q[index]
             arr[i][j] = square(t.c)
             dx, dy = choice(c_moves)
-
+            arr[i][j].height = height
+            if t.t == "water river":
+                height -= randint(300, 400)
+            else:
+                height -= randint(-400, 400)
+                
             if (0 <= i + dx < SIZE and 0 <= j + dy < SIZE) and arr[i + dx][j + dy].t == "ground":
                 q.append((i + dx, j + dy))
             else:
@@ -275,4 +282,8 @@ while True:
         a, b = map(int, s)
         world.Print(a, b)
     elif len(s) == 3:
-        print(world.area[int(s[1])][int(s[2])].t)
+        print("here there is ")
+        colored.colored_print(\
+        world.area[int(s[1])][int(s[2])].t, '\n', "dark_blue", 0, "gray", 1, [])
+        print("hight ")
+        colored.colored_print(str(world.area[int(s[1])][int(s[2])].height),'\n',  "green", 0, "gray", 1, [])
