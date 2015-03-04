@@ -36,4 +36,4 @@ def Help():
         colored_print("abacaba", end="", color="green",
         version=0, bg="red", version_back=0, special = ["blinked", "inverse"])""")
 #colored_print("abacaba", end="\n", color="green", version=1, bg="yellow", version_back=1, special = ["blinked", "inverse"])
-Help()
+#Help()

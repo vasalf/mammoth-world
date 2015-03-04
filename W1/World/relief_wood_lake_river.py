@@ -1,8 +1,13 @@
 #!/usr/bin/python3
 
 from random import *
+
 from math import sqrt
+
 import sys
+
+import colored
+
 
 sys.setrecursionlimit(100000)
 SIZE = 80
@@ -62,13 +67,13 @@ class square:
 ##colors##
 # colors #
 color = {}
-color["T"] = '42'
-color['"'] = '57;103'
-color["S"] = '5;34;104'
-color["~"] = '5;94;44'
-color[swamp] = '2;32;40'
-color[meadle] = '7;92'
-color[grass] = '1;30;102'
+color["T"] = ["T",'', "black", 0, "green", 0, []]
+color['"'] = ['"', '', "gray", 1, "yellow", 0, []]
+color["S"] = ["S", '', "dark_blue", 1, "dark_blue", 0, ["blinked"]]
+color["~"] = ["~", '', "dark_blue", 1, "dark_blue", 0, ["blinked", "inverse"]]
+color[swamp] = [swamp, '', "purpur", 1, "green", 1, ["inverse"]]
+color[meadle] = [meadle, '', "gray", 0, "green", 1, []]
+color[grass] = [grass, '', "black", 0, "green", 1, ["hard"]]
 ##
 
 
@@ -215,12 +220,12 @@ class terra:
         for i in range(x1, x2):
             for j in range(y1, y2):
 #                print(str(self.area[i][j]), end='')
-                print("\033[" + color[str(self.area[i][j])] + "m" + str(self.area[i][j]) + "\033[0m", end='')
+                colored.colored_print(*color[str(self.area[i])])
             print()
         print("\n\n\n\n\n\n")
         return '\n'
             
-print("\033[31mType Size of the World\033[0m\n")
+colored.colored_print("Type Size of the World", '\n\n', "red", 0, "gray", 1)
 world = terra(int(input()))
 print("New World is created\n")
 while True:
