@@ -16,7 +16,7 @@ MountainSize = [102, 124, 87]
 SEA_SIZE = [37, 64, 144, 179]
 SeaSizeSmall = [30, 68, 40, 54]
 RiverSizeSmall = [27, 19, 17, 23]
-RiverSize = [34, 49, 27, 40]
+RiverSize = [34, 49, 27, 40, 144, 121, 75, 97]
 ###
 ##amount##
 
@@ -25,10 +25,10 @@ grass = '`'
 swamp = ';'
 meadle = ':'
 simple = '"'
-
-sea = chr(8776)
+mountain = '^'
+sea = '~'
 moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, -1), (-1, 1), (-1, -1), (1, 1)]
-types = ['`', '"', '"', '"', '"', '"', '"', '"',  "S", "T", '~', 'S', '~', "^"]
+types = ['`', '"',  "T", '~', 'S', "^", ':', ';']
 
 # types #
 chances = {}
@@ -57,6 +57,8 @@ class square:
             self.t = "water river"
         elif typ == 'O':
             self.t = "ice-berg"
+        elif typ == '^':
+            self.t = "mountain"
 
     def __str__(self):
         return str(self.c)
@@ -73,7 +75,9 @@ color[sea] = [sea, '', 'light_blue', 0, "dark_blue", 1, ["blinked"]]
 color[swamp] = [swamp, '', "purpur", 0, "green", 1, ["inverse"]]
 color[meadle] = [meadle, '', "green", 0, "green", 1, ["light"]]
 color[grass] = [grass, '', "yellow", 0, "green", 1, ["hard"]]
+color['^'] = [mountain, '', 'black', 0, 'gray', 0, ["light"]]
 ##
+
 
 
 def generate_sea_first(arr, i, j):
@@ -83,6 +87,7 @@ def generate_sea_first(arr, i, j):
     elif arr[i][j].c != '':
         return 0
     arr[i][j] = square(sea)
+
     temp = 2 * SIZE / sqrt(min(i + 1, SIZE - i) * min(j + 1, SIZE - j))
     if randint(1, SIZE) <= choice(chance) * temp:
         generate_sea_first(arr, i - 1, j)
@@ -120,7 +125,7 @@ def generate(arr, i, j, t, flag=0):
             else:
                 size = choice(WoodSizeSmall)
         else:
-            size = randint(SIZE * 12, SIZE * 25)
+            size = randint(SIZE * 2, SIZE * 5)
 
         print(size)
         while index < size and index < len(q):
@@ -152,13 +157,16 @@ def generate(arr, i, j, t, flag=0):
             if index % 7 == 0:
                 shuffle(q)
             index += 1
-    elif t.t == 'water river':
+    elif t.t == 'water river' or t.t == 'mountain':
         index = 0
         q = [(i, j)]
-        if flag == 0:
-            size = choice(RiverSize)
+        if t.t == 'water river':
+            if flag == 0:
+                size = choice(RiverSize)
+            else:
+                size = choice(RiverSizeSmall)
         else:
-            size = choice(RiverSizeSmall)
+            size = choice(MountainSize)
         c_moves = moves[:]
         if i < SIZE // 2 and j < SIZE // 2:
             c_moves.extend([(0, -1), (-1, 0), (0, -1), (-1, 0)] * 5)
@@ -171,11 +179,17 @@ def generate(arr, i, j, t, flag=0):
 
         while index < size and index < len(q):
             i, j = q[index]
-            arr[i][j] = square('~')
+            arr[i][j] = square(t.c)
             dx, dy = choice(c_moves)
 
             if (0 <= i + dx < SIZE and 0 <= j + dy < SIZE):
                 q.append((i + dx, j + dy))
+            for idx in range(len(moves)):
+                if (0 <= i < SIZE) and (0 <= j < SIZE) and \
+                (arr[i + moves[idx][0]][j + moves[idx][1]].t == "water lake" or\
+                arr[i + moves[idx][0]][j + moves[idx][1]].t == "sea water"):
+                    print(1)
+                    return 0
             if (arr[q[-1][0]][q[-1][1]].t == 'water lake'):
                 return 0
 
@@ -211,13 +225,13 @@ class terra:
                     self.area[i][j] = square('"')
         
         for i in range(obj_big):
-            i, j = randint(10, SIZE - 10), randint(10, SIZE - 10)
-            generate(self.area, i, j, square(choice(['S', '~', 'T'])))
+            i, j = randint(10, int(SIZE * 0.8)), randint(10, int(SIZE * 0.8))
+            generate(self.area, i, j, square(choice(['S', '~', 'T', mountain])))
         for i in range(obj_large):
             i, j = randint(0, SIZE - 1), randint(0, SIZE - 1)
             generate(self.area, i, j, square(choice([swamp, meadle, grass])))
         for i in range(obj_small):
-            i, j = randint(10, SIZE - 10), randint(10, SIZE - 10)
+            i, j = randint(10, int(SIZE * 0.8)), randint(10, int(SIZE * 0.8))
             generate(self.area, i, j, square(choice(['S', '~', 'T'])), 1)
 
     def Print(self, x1=0, y1=0, x2=SIZE, y2=SIZE):
@@ -233,7 +247,7 @@ print("\033[31mType Size of the World\033[0m\n")
 world = terra(int(input()))
 print("New World is created\n")
 while True:
-    s = input()
-    if len(s) != 0:
-        a, b, c, d = map(int, s.split())
+    s = input().split()
+    if len(s) == 4:
+        a, b, c, d = map(int, s)
         world.Print(a, b, c, d)
