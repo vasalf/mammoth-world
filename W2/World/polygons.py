@@ -77,25 +77,25 @@ def convex(point_set):
     return list(map(tuple, res[:-1]))
 
 
-n = int(input())
-lst = []
-for i in range(n):
-    lst.append(tuple(map(int, input().split())))
+def unite(lst):
+    res = []
+    for pol in lst:
+        for p in pol:
+            res.append(p)
+    return res
 
-print("\n".join(map(str, convex(lst))))
 
+class random_polygon:
+    """Constructor args:
+       self: no comments
+       arg: if list -> list of vertex, if int -> number of vertex to generate
+       borders: a tuple of points (tuples of numbers). Generated polygon will
+                lie in rectangle with left corner in first and right corner
+                in second
+       must_be_in: an iterable object of random polygons that must be into the
+                   generated polygon
 
-#
-#class random_polygon:
-#    """Constructor args:
-#       self: no comments
-#       arg: if list -> list of vertex, if int -> number of vertex to generate
-#       borders: a tuple of points (tuples of numbers). Generated polygon will
-#                lie in rectangle with left corner in first and right corner
-#                in second
-#       must_be_in: an iterable object of point(tuples) that must be in
-#                   generated polygon
-"""
+    """
     def __init__(self, arg, borders=None, must_be_in=None):
         if isinstance(arg, list):
             # Then just make a polygon from list
@@ -109,7 +109,28 @@ print("\n".join(map(str, convex(lst))))
             assert arg > 0
             assert borders is not None
             assert isinstance(must_be_in, list)
-            assert len(must_be_in) >= 3
             ld, ru = borders
 
-    def __getitem__ """
+            res = convex(unite(must_be_in))
+            self.__points = res[:]
+
+    def __getitem__(self, i):
+        return self.__points[i]
+
+    def __iter__(self):
+        return iter(self.__points)
+
+    def __str__(self):
+        return "\n".join(map(str, self))
+
+
+n = int(input())
+inner = []
+for i in range(n):
+    k = int(input())
+    poly = []
+    for i in range(k):
+        poly.append(tuple(map(int, input().split())))
+    inner.append(random_polygon(poly))
+
+print(random_polygon(1, ((0, 0), (1, 1)), inner))
