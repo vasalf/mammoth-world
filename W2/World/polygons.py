@@ -85,6 +85,24 @@ def unite(lst):
     return res
 
 
+def is_point_in_segment(p, a, b):
+    return cross_product(vector(p, a), vector(p, b)) == 0 and \
+           dot_product(vector(p, a), vector(p, b)) < 0
+
+
+def do_segments_intersect(a, b, c, d):
+    if cross_product(vector(a, b), vector(c, d)) == 0:
+        return is_point_in_segment(a, c, d) or \
+               is_point_in_segment(b, c ,d) or \
+               is_point_in_segment(c, a, b) or \
+               is_point_in_segment(d, a, b)
+    else:
+        return cross_product(vector(a, c), vector(a, b)) * \
+               cross_product(vector(a, b), vector(a, d)) > 0 and \
+               cross_product(vector(c, a), vector(c, d)) * \
+               cross_product(vector(c, d), vector(c, b)) > 0
+
+
 class random_polygon:
     """Constructor args:
        self: no comments
@@ -96,6 +114,18 @@ class random_polygon:
                    generated polygon
 
     """
+    def __is_intersecting(self, polys, a, b):
+        for p in polys:
+            k = list(p) + [p[0]]
+            for i in range(len(p)):
+                if do_segments_intersect(k[i], k[i + 1], a, b):
+                    if k[i] not in [a, b] and k[i + 1] not in [a, b]:
+                        return True
+        return False
+
+    def __is_in_borders(self, p, ld, ru):
+        return ld[0] <= p[0] <= ru[0] and ld[1] <= p[0] <= ru[1]
+
     def __init__(self, arg, borders=None, must_be_in=None):
         if isinstance(arg, list):
             # Then just make a polygon from list
@@ -112,7 +142,44 @@ class random_polygon:
             ld, ru = borders
 
             res = convex(unite(must_be_in))
-            self.__points = res[:]
+            NUM = 2 * (ru[0] - ld[0] + ru[1] - ld[1])
+            for i in range(NUM):
+                print(i, NUM)
+                trial = 0
+                generated = False
+                while not generated and trial < 100:
+                    k = randint(0, len(res) - 1)
+                    mn_x = min(res[k][0], res[k - 1][0])
+                    mx_x = max(res[k][0], res[k - 1][0])
+                    mn_y = min(res[k][1], res[k - 1][1])
+                    mx_y = max(res[k][1], res[k - 1][1])
+                    if mn_x == mx_x:
+                        x = randint(mn_x - (ru[0] - ld[0] + 9) // 10, \
+                                    mn_x + (ru[0] - ld[0] + 9) // 10)
+                    else:
+                        x = randint(mn_x, mx_x)
+                    if mn_y == mx_y:
+                        y = randint(mn_y - (ru[1] - ld[1] + 9) // 10, \
+                                    mn_y + (ru[1] - ld[1] + 9) // 10)
+                    else:
+                        y = randint(mn_y, mx_y)
+                    
+                    p = (x, y)
+                    if p != res[k] and p != res[k - 1] and \
+                       self.__is_in_borders(p, ld, ru) and \
+                       not self.__is_intersecting(must_be_in, res[k - 1], \
+                       p) and \
+                       not self.__is_intersecting(must_be_in, p, res[k]) and \
+                       not self.__is_intersecting([res], p, res[k]) and \
+                       not self.__is_intersecting([res], p, res[k]) and \
+                       not is_point_in_segment(p, res[k - 1], res[k]):
+                       generated = True
+                       res = res[:k] + [p] + res[k:]
+                    trial += 1
+            self.__points = res
+
+    def __len__(self):
+        return len(self.__points)
 
     def __getitem__(self, i):
         return self.__points[i]
@@ -122,6 +189,9 @@ class random_polygon:
 
     def __str__(self):
         return "\n".join(map(str, self))
+
+    def __list__(self):
+        return self.__points
 
 
 n = int(input())
@@ -133,4 +203,4 @@ for i in range(n):
         poly.append(tuple(map(int, input().split())))
     inner.append(random_polygon(poly))
 
-print(random_polygon(1, ((0, 0), (1, 1)), inner))
+print(random_polygon(1, ((0, 0), (30, 30)), inner))
