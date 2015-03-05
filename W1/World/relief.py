@@ -256,8 +256,8 @@ class terra:
         global obj_large
         obj_large = int(SIZE ** 0.5 / 2)
         self.area = [[square(0)] * SIZE for i in range(SIZE)]
-        point = objects.obj('X', SIZE)
-        self.objects = [point]
+        self.point = objects.obj('X', SIZE)
+        self.objects = [self.point]
         self.t = 25
         for i in range(SIZE):
             for j in range(SIZE):
@@ -291,12 +291,14 @@ class terra:
             i, j = randint(10, int(SIZE * 0.8)), randint(10, int(SIZE * 0.8))
             generate(self.area, i, j, square(choice(['S', 'T'])), 1)
     def go_to(self, x, y):
-        self.objects[0].go_to(x, y)
-    def look(self, obj=0):
-        if obj == 0:
-            obj = self.objects[0]
+        self.point.go_to(x, y)
+    def look(self, obj=-1):
+        if obj == -1:
+            obj = self.point
+        else:
+            obj = self.attr[obj]
         arr = list(map(lambda a: (a.x, a.y), self.objects))
-        i = 1
+        i = 1 
         while i < len(arr):
             if (obj.x, obj.y) == arr[i]:
                 world.area[obj.x][obj.y].attributes.append(self.objects[i])
@@ -310,7 +312,11 @@ class terra:
             
    
     
-    def Print(self, obj):
+    def Print(self, obj=-1):
+        if obj==-1:
+            obj = self.point
+        else:
+            obj = self.attr[obj]
         os.system("clear")
         x, y = obj.x, obj.y
         x1 = max(x - 15, 0)
@@ -323,47 +329,51 @@ class terra:
             for j in range(y1, y2):
 #                print(str(self.area[i][j]), end='')
                 if (i, j) in arr:
+                    
                     curr_arr = self.objects[arr.index((i, j))].color_args()
                     colored.colored_print(curr_arr[0], curr_arr[1],
                     curr_arr[2], curr_arr[3], color[str(self.area[i][j])][4],
                     color[str(self.area[i][j])][5], curr_arr[6])
                 else:
                     colored.colored_print(*color[str(self.area[i][j])])
-            colored.colored_print(str(i), '\n', 'red' if i == self.objects[0].x else "black", 0, "gray", 0, [])
+            colored.colored_print(str(i), '\n', 'red' if i == self.point.x else "black", 0, "gray", 0, [])
         print(y1)
         return '\n'
             
 print("\033[31mType Size of the World\033[0m\n")
 world = terra(int(input()))
 print("New World is created\n")
+
 #==================
 #MAMMOTH GENERATION
+'''
 Herds = []
-for new_mammoth in mammoth.generate_mammoth_herds(SIZE):
+for new_mammoth in mammoth.generate_mammoth_herds(SIZE, world):
     world.objects.append(new_mammoth)
-    world.area[new_mammoth.x][new_mammoth.y].obj = world.objects[-1]
+    world.area[new_mammoth.x][new_mammoth.y].obj = world.objects[-1]'''
 #==================
+
 while True:
     s = input()
     if s == 'go_to':
         a, b = map(int, input().split())
         world.go_to(a, b)
-        world.Print(world.objects[0])
+        world.Print()
     if s == 'up':
-        world.objects[0].move(-1, 0)
-        world.Print(world.objects[0]) 
+        world.point.move(-1, 0)
+        world.Print() 
         world.look()
     elif s == 'left':
-        world.objects[0].move(0, -1)
-        world.Print(world.objects[0]) 
+        world.point.move(0, -1)
+        world.Print() 
         world.look()
     elif s == 'right':
-        world.objects[0].move(0, 1)
-        world.Print(world.objects[0]) 
+        world.point.move(0, 1)
+        world.Print() 
         world.look()
     elif s == 'down':
-        world.objects[0].move(1, 0)
-        world.Print(world.objects[0]) 
+        world.point.move(1, 0)
+        world.Print() 
         world.look()
     elif s == 'look':
         world.look()
@@ -373,9 +383,9 @@ while True:
         world.objects[-1].go_to(int(s[1]), int(s[2]))
 
     elif s == "print":
-        world.Print(world.objects[0])
+        world.Print()
     elif s == "turn":
         for obj in world.objects:
             obj.turn()
-        world.Print(world.objects[0])
+        world.Print()
 
