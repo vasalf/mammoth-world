@@ -1,5 +1,6 @@
 colored = {}
 colored['X'] = ['X', '', 'red', 0, 'gray', 1, ["blinked"]]
+colored['M'] = ['M', '', 'red', 0, 'gray', 0, ["blinked"]]
 class obj:
     def __init__(self, sym, size):
         self.c = sym
