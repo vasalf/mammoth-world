@@ -31,7 +31,7 @@ class mammoth(objects.obj):
        d = self.dist(x, y)
        if d > len(Herd[herdID].mammoths) // 2:
            self.move_to_leader()
-        else:
+       else:
             self.wanderAround()
 
     def turn(self):
