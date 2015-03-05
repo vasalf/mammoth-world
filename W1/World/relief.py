@@ -365,9 +365,5 @@ while True:
     elif s == "turn":
         for obj in world.objects:
             obj.turn()
-<<<<<<< HEAD
         world.Print(world.objects[0])
-=======
 
-        world.Print(world.objects[0]) 
->>>>>>> 8f18f27ba9052d55f8823862ed86d2ef3d784159

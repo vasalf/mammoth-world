@@ -1,10 +1,7 @@
 colored = {}
 colored['X'] = ['X', '', 'red', 0, 'gray', 1, ["blinked"]]
-<<<<<<< HEAD
 colored['M'] = ['M', '', 'red', 0, 'gray', 0, ["blinked"]]
-=======
 colored['@'] = ['@', '', "purpur", 0, 'black', 0, ["hard"]]
->>>>>>> 8f18f27ba9052d55f8823862ed86d2ef3d784159
 class obj:
     def __init__(self, sym, size):
         self.c = sym
