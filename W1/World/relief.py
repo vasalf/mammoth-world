@@ -6,6 +6,7 @@ import sys
 import colored
 import os
 import objects
+import mammoth
 
 sys.setrecursionlimit(100000)
 SIZE = 80
@@ -79,6 +80,8 @@ class square:
             self.t = "ice-berg"
         elif typ == '^':
             self.t = "mountain"
+
+        self.obj = None
 
     def __str__(self):
 #        if self.atr
@@ -313,8 +316,8 @@ class terra:
 #                print(str(self.area[i][j]), end='')
                 if (i, j) in arr:
                     curr_arr = self.objects[arr.index((i, j))].color_args()
-                    colored.colored_print(curr_arr[0], curr_arr[1],\
-                    curr_arr[2], curr_arr[3], color[str(self.area[i][j])][4],\
+                    colored.colored_print(curr_arr[0], curr_arr[1],
+                    curr_arr[2], curr_arr[3], color[str(self.area[i][j])][4],
                     color[str(self.area[i][j])][5], curr_arr[6])
                 else:
                     colored.colored_print(*color[str(self.area[i][j])])
@@ -325,6 +328,9 @@ class terra:
 print("\033[31mType Size of the World\033[0m\n")
 world = terra(int(input()))
 print("New World is created\n")
+for new_mammoth in mammoth.generate_mammoth_herds(SIZE):
+    world.objects.append(new_mammoth)
+    world.area[new_mammoth.x][new_mammoth.y].obj = world.objects[-1]
 while True:
     s = input()
     if s == 'go_to':
@@ -357,8 +363,7 @@ while True:
     elif s == "print":
         world.Print(world.objects[0])
     elif s == "turn":
-        
         for obj in world.objects:
             obj.turn()
+        world.Print(world.objects[0])
 
-        world.Print(world.objects[0]) 
