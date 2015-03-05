@@ -105,14 +105,22 @@ def do_segments_intersect(a, b, c, d):
 
 def do_segment_and_hor_ray_intersect(p, a, b):
     q = p[0] + 1, p[1]
-    if dot_product(vector(p, q), vector(p, a)) < 0 and \
-       dot_product(vector(p, q), vector(p, b)) < 0:
+    if not(cross_product(vector(p, a), vector(p, q)) * \
+       cross_product(vector(p, a), vector(p, b))):
         return False
-    if
+    if not(cross_product(vector(p, a), vector(p, q)) * \
+       cross_product(vector(p, q), vector(p, b))):
+        return False
+    return True
 
 
 def is_point_in_polygon(p, lst):
-    
+    num = 0
+    for i in range(len(lst)):
+        if do_segment_and_hor_ray_intersect(p, lst[i - 1], lst[i]):
+            if p != lst[i - 1]:
+                num += 1
+    return (num & 1) == 1
 
 
 class random_polygon:
@@ -128,7 +136,18 @@ class random_polygon:
     """
     def __is_intersecting(self, polys, a, b):
         for p in polys:
+            st = set(p)
             k = list(p) + [p[0]]
+            if a in st:
+                if is_point_in_polygon(b, p):
+                    return True
+            elif b in st:
+                if is_point_in_polygon(a, p):
+                    return True
+            else:
+                if is_point_in_polygon(a, p) or \
+                   is_point_in_polygon(b, p):
+                    return True
             for i in range(len(p)):
                 if do_segments_intersect(k[i], k[i + 1], a, b):
                     if k[i] not in [a, b] and k[i + 1] not in [a, b]:
@@ -156,7 +175,6 @@ class random_polygon:
             res = convex(unite(must_be_in))
             NUM = 2 * (ru[0] - ld[0] + ru[1] - ld[1])
             for i in range(NUM):
-                print(i, NUM)
                 trial = 0
                 generated = False
                 while not generated and trial < 100:
@@ -215,4 +233,11 @@ for i in range(n):
         poly.append(tuple(map(int, input().split())))
     inner.append(random_polygon(poly))
 
-print(random_polygon(1, ((0, 0), (30, 30)), inner))
+
+poly = random_polygon(1, ((0, 0), (30, 30)), inner)
+print(poly)
+for p in inner:
+    for k in p:
+        if not is_point_in_polygon(k, poly):
+            print("E:", k)
+
