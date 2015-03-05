@@ -67,7 +67,7 @@ class square:
         elif typ == grass:
             self.t2 = "grass"
         self.height = 0
-        self.atributes = []
+        self.attributes = []
         if typ == 'T':
             self.t = 'tree'
         elif typ == chr(8776):
@@ -86,6 +86,8 @@ class square:
     def __str__(self):
 #        if self.atr
         return str(self.c)
+    def info(self):
+        return (self.t + ', ' + (self.t2 + ', ') * bool(self.t2) + ', '.join(map(str, self.attributes))).rstrip(', ')
     
 
 
@@ -293,12 +295,18 @@ class terra:
     def look(self, obj=0):
         if obj == 0:
             obj = self.objects[0]
+        arr = list(map(lambda a: (a.x, a.y), self.objects))
+        i = 1
+        while i < len(arr):
+            if (obj.x, obj.y) == arr[i]:
+                world.area[obj.x][obj.y].attributes.append(self.objects[i])
+            i += 1
         print("Here ", obj.x, obj.y, "There is", end = ' ')
         colored.colored_print(\
-        world.area[obj.x][obj.y].t + world.area[obj.x][obj.y].t2, '\n', "dark_blue", 0, "gray", 1, [])
+        world.area[obj.x][obj.y].info(), '\n', "dark_blue", 0, "gray", 1, [])
         print("Height = ", end = ' ')
         colored.colored_print(str(world.area[obj.x][obj.y].height),'\n',  "green", 0, "gray", 1, [])
-
+        world.area[obj.x][obj.y].attributes = []
             
    
     
