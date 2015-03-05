@@ -328,9 +328,13 @@ class terra:
 print("\033[31mType Size of the World\033[0m\n")
 world = terra(int(input()))
 print("New World is created\n")
+#==================
+#MAMMOTH GENERATION
+Herds = []
 for new_mammoth in mammoth.generate_mammoth_herds(SIZE):
     world.objects.append(new_mammoth)
     world.area[new_mammoth.x][new_mammoth.y].obj = world.objects[-1]
+#==================
 while True:
     s = input()
     if s == 'go_to':
