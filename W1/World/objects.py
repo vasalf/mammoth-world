@@ -19,5 +19,19 @@ class obj:
     def turn(self):
         return
     def color_args(self):
-
         return colored[self.c]
+
+def Help():
+    print("""\n
+    If you want to make a new type of object, 
+    you should go into the file W1/World/objects.py and write: 
+    colored['<view of object>'] = ['<view of object>', '', '<color>', 0, 
+    '<background>', 0, []] \n 
+    if you want to make new object in new programm, write 
+    a = obj(<symbol>, <size of the world>)
+    if you want to move, you should use "move"\n
+    if you want to print all, you should ask me
+    """)
+
+
+Help()
