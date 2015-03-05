@@ -4,6 +4,9 @@ from random import *
 from math import sqrt
 import sys
 import colored
+import os
+import objects
+
 sys.setrecursionlimit(100000)
 SIZE = 80
 obj_big = 30
@@ -88,10 +91,10 @@ class square:
 color = {}
 color["T"] = ["T",'', "black", 0, "green", 0, []]
 color['"'] = ['"', '', "gray", 1, "yellow", 1, []]
-color["S"] = ["S", '', "dark_blue", 1, "dark_blue", 0, ["blinked"]]
-color["~"] = ["~", '', "dark_blue", 1, "light_blue", 0, ["blinked", "inverse"]]
-color[sea] = [sea, '', 'dark_blue', 1, "dark_blue", 0, ["blinked"]]
-color[swamp] = [swamp, '', "purpur", 0, "green", 1, ["inverse"]]
+color["S"] = ["S", '', "dark_blue", 1, "dark_blue", 0, []]
+color["~"] = ["~", '', "dark_blue", 1, "light_blue", 0, []]
+color[sea] = [sea, '', 'dark_blue', 1, "dark_blue", 0, []]
+color[swamp] = [swamp, '', "purpur", 0, "green", 1, []]
 color[meadle] = [meadle, '', "green", 0, "green", 1, ["light"]]
 color[grass] = [grass, '', "yellow", 0, "green", 1, ["hard"]]
 color['^'] = [mountain, '', 'black', 0, 'gray', 0, ["light"]]
@@ -248,7 +251,8 @@ class terra:
         global obj_large
         obj_large = int(SIZE ** 0.5 / 2)
         self.area = [[square(0)] * SIZE for i in range(SIZE)]
-        
+        point = objects.obj('X', SIZE)
+        self.objects = [point]
         self.t = 25
         for i in range(SIZE):
             for j in range(SIZE):
@@ -282,38 +286,48 @@ class terra:
             i, j = randint(10, int(SIZE * 0.8)), randint(10, int(SIZE * 0.8))
             generate(self.area, i, j, square(choice(['S', 'T'])), 1)
     def go_to(self, x, y):
-        self.coord = [x, y]
-    def move(self, dx, dy, obj=self.coord):
-        if 0 <= obj[0] + dx < self.size and 0 <= obj[1] + dy < self.size:
+        self.objects[0].go_to(x, y)
+    def move(self, dx, dy, obj=0):
+        if obj == 0:
+            obj = self.objects[0]
+        if 0 <= obj.x + dx < self.size and 0 <= obj.y + dy < self.size:
 
-            obj[0] += dx
-            obj[1] += dy
+            obj.x += dx
+            obj.y += dy
 #            print(self.coord[0], self.coord[1])
-    def look(self):
-        print("Here ", self.coord[0], self.coord[1], "There is", end = ' ')
+    def look(self, obj=0):
+        if obj == 0:
+            obj = self.objects[0]
+        print("Here ", obj.x, obj.y, "There is", end = ' ')
         colored.colored_print(\
-        world.area[self.coord[0]][self.coord[1]].t + world.area[self.coord[0]][self.coord[1]].t2, '\n', "dark_blue", 0, "gray", 1, [])
+        world.area[obj.x][obj.y].t + world.area[obj.x][obj.y].t2, '\n', "dark_blue", 0, "gray", 1, [])
         print("Height = ", end = ' ')
-        colored.colored_print(str(world.area[self.coord[0]][self.coord[1]].height),'\n',  "green", 0, "gray", 1, [])
-        
+        colored.colored_print(str(world.area[obj.x][obj.y].height),'\n',  "green", 0, "gray", 1, [])
+
+            
    
     
-    def Print(self, x=0, y=0):
+    def Print(self, obj):
+        os.system("clear")
+        x, y = obj.x, obj.y
         x1 = max(x - 50, 0)
         x2 = min(x + 50, self.size)
         y1 = max(y - 50, 0)
         y2 = min(y + 50, self.size)
+        arr = list(map(lambda a: (a.x, a.y), self.objects))
+        print(arr)
         for i in range(x1, x2):
             for j in range(y1, y2):
 #                print(str(self.area[i][j]), end='')
-                if [i, j] == self.coord:
-                    colored.colored_print("X", '', "red", 0, color[str(self.area[i][j])][4],\
-                    color[str(self.area[i][j])][5], ["blinked"])
+                if (i, j) in arr:
+                    curr_arr = self.objects[arr.index((i, j))].color_args()
+                    colored.colored_print(curr_arr[0], curr_arr[1],\
+                    curr_arr[2], curr_arr[3], color[str(self.area[i][j])][4],\
+                    color[str(self.area[i][j])][5], curr_arr[6])
                 else:
                     colored.colored_print(*color[str(self.area[i][j])])
-            colored.colored_print(str(i), '\n', 'red' if i == self.coord[0] else "black", 0, "gray", 0, [])
+            colored.colored_print(str(i), '\n', 'red' if i == self.objects[0].x else "black", 0, "gray", 0, [])
         print(y1)
-        print("\n\n\n\n\n\n")
         return '\n'
             
 print("\033[31mType Size of the World\033[0m\n")
@@ -324,7 +338,7 @@ while True:
     if s == 'go_to':
         a, b = map(int, input().split())
         world.go_to(a, b)
-        world.Print(a, b)
+        world.Print(world.objects[0])
     if s == 'up':
         world.move(-1, 0)
         world.look()
@@ -340,4 +354,9 @@ while True:
     elif s == 'look':
         world.look()
     elif s == "print":
-       world.Print(*world.coord) 
+        world.Print(world.objects[0]) 
+    elif s == "turn":
+        
+        for obj in world.objects:
+            obj.turn()
+        Print()
