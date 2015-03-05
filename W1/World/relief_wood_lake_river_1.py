@@ -14,11 +14,12 @@ WOOD_SIZE = [101, 152, 210, 253]
 WoodSizeSmall = [91, 103, 95, 88, 127]
 MountainSize = [102, 124, 187]
 MeadleSize = [300, 176, 145]
-SEA_SIZE = [37, 64, 74, 87]
-SeaSizeSmall = [30, 68, 40, 54]
+SEA_SIZE = [37, 44, 24, 17]
+SeaSizeSmall = [30, 8, 40, 54]
 RiverSizeSmall = [27, 19, 17, 23]
 RiverSize = [34, 49, 27, 40, 14, 121, 75, 97]
 ###
+##World Constants
 ##amount##
 
 # amount #
@@ -29,10 +30,17 @@ simple = '"'
 mountain = '^'
 river = '~'
 sea = '~'
+tree = 'T'
 moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, -1), (-1, 1), (-1, -1), (1, 1)]
 types = ['`', '"',  "T", '~', 'S', "^", ':', ';']
 
 # types #
+height_constants = {}
+height_constants[meadle] = [1000, 2000, 30]
+height_constants[grass] = [200, 500, 150]
+height_constants[swamp] = [-100, 100, 10]
+height_constants[tree] = [-50, 150, 30]
+##
 chances = {}
 chances["~"] = [0.6, 0.7, 0.3]
 chances["^"] = [0.1, 0.2, 0.5]
@@ -47,6 +55,13 @@ class square:
     def __init__(self, typ):
         self.c = typ if typ != 0 else ''
         self.t = 'ground'
+        self.t2 = ''
+        if typ == swamp:
+            self.t2 = "swamp"
+        elif typ == meadle:
+            self.t2 = "meadle"
+        elif typ == grass:
+            self.t2 = "grass"
         self.height = 0
         self.atributes = []
         if typ == 'T':
@@ -63,7 +78,9 @@ class square:
             self.t = "mountain"
 
     def __str__(self):
+#        if self.atr
         return str(self.c)
+    
 
 
 ##colors##
@@ -84,6 +101,7 @@ color['^'] = [mountain, '', 'black', 0, 'gray', 0, ["light"]]
 
 def generate_sea_first(arr, i, j):
     SIZE = len(arr)
+
     if not (0 <= i < len(arr) and 0 <= j < len(arr[0])):
         return 0
     elif arr[i][j].c != '':
@@ -119,6 +137,8 @@ def generate(arr, i, j, t, flag=0):
         return 0
 
     if t.t == 'tree' or t.t == 'ground':
+        height = randint(*height_constants[t.c][:2])
+        height_delta = height_constants[t.c][2]
         q = [(i, j)]
         index = 0
         if t.t == 'tree':
@@ -132,7 +152,9 @@ def generate(arr, i, j, t, flag=0):
 
         while index < size and index < len(q):
             i, j = q[index]
-            arr[i][j] = t
+            arr[i][j] = square(t.c)
+            arr[i][j].height = height
+            height += randint(-height_delta, height_delta)
             for dx, dy in moves:
                 if 0 <= i + dx < SIZE and 0 <= j + dy < SIZE:
                     if random() < 0.76 and arr[i + dx][j + dy].t == "ground":
@@ -162,7 +184,7 @@ def generate(arr, i, j, t, flag=0):
     elif t.t == 'water river' or t.t == 'mountain':
         index = 0
         q = [(i, j)]
-        height = randint(5000, 10000)
+        height = randint(2000, 4000)
         if t.t == 'water river':
             
             if flag == 0:
@@ -180,17 +202,15 @@ def generate(arr, i, j, t, flag=0):
             c_moves.extend([(-1, 0), (0, 1), (-1, 0), (0, 1)] * 5)
         else:
             c_moves.extend([(1, 0), (0, 1), (1, 0), (0, 1)] * 5)
-
         while index < size and index < len(q):
             i, j = q[index]
             arr[i][j] = square(t.c)
             dx, dy = choice(c_moves)
-            arr[i][j].height = height
             if t.t == "water river":
                 height -= randint(300, 400)
             else:
                 height -= randint(-400, 400)
-                
+            arr[i][j].height = height
             if (0 <= i + dx < SIZE and 0 <= j + dy < SIZE) and arr[i + dx][j + dy].t == "ground":
                 q.append((i + dx, j + dy))
             else:
@@ -214,7 +234,8 @@ def generate(arr, i, j, t, flag=0):
 
 class terra:
     def __init__(self, SIZE):
-    ##
+    ##  
+        self.coord = [0, 0]
         if type(SIZE) == list:
             self.area = SIZE
             return 
@@ -242,6 +263,7 @@ class terra:
         for i in range(mountain_amount):
             k, j = randint(0, int(SIZE * 0.8)), randint(10, int(SIZE * 0.8))
             curr_mount = generate(self.area, k, j, square(mountain))
+            #self.Print(50, 50)
             for i in range(2):
                 k, j = choice(curr_mount)
                 generate(self.area, k, j, square(meadle))
@@ -253,12 +275,29 @@ class terra:
             i, j = randint(10, int(SIZE * 0.8)), randint(10, int(SIZE * 0.8))
             generate(self.area, i, j, square(choice(['S', 'T'])))
         for i in range(obj_large):
+            
             i, j = randint(0, SIZE - 1), randint(0, SIZE - 1)
             generate(self.area, i, j, square(choice([swamp, grass])))
         for i in range(obj_small):
             i, j = randint(10, int(SIZE * 0.8)), randint(10, int(SIZE * 0.8))
             generate(self.area, i, j, square(choice(['S', 'T'])), 1)
+    def go_to(self, x, y):
+        self.coord = [x, y]
+    def move(self, dx, dy, obj=self.coord):
+        if 0 <= obj[0] + dx < self.size and 0 <= obj[1] + dy < self.size:
 
+            obj[0] += dx
+            obj[1] += dy
+#            print(self.coord[0], self.coord[1])
+    def look(self):
+        print("Here ", self.coord[0], self.coord[1], "There is", end = ' ')
+        colored.colored_print(\
+        world.area[self.coord[0]][self.coord[1]].t + world.area[self.coord[0]][self.coord[1]].t2, '\n', "dark_blue", 0, "gray", 1, [])
+        print("Height = ", end = ' ')
+        colored.colored_print(str(world.area[self.coord[0]][self.coord[1]].height),'\n',  "green", 0, "gray", 1, [])
+        
+   
+    
     def Print(self, x=0, y=0):
         x1 = max(x - 50, 0)
         x2 = min(x + 50, self.size)
@@ -267,8 +306,12 @@ class terra:
         for i in range(x1, x2):
             for j in range(y1, y2):
 #                print(str(self.area[i][j]), end='')
-                colored.colored_print(*color[str(self.area[i][j])])
-            print(i)
+                if [i, j] == self.coord:
+                    colored.colored_print("X", '', "red", 0, color[str(self.area[i][j])][4],\
+                    color[str(self.area[i][j])][5], ["blinked"])
+                else:
+                    colored.colored_print(*color[str(self.area[i][j])])
+            colored.colored_print(str(i), '\n', 'red' if i == self.coord[0] else "black", 0, "gray", 0, [])
         print(y1)
         print("\n\n\n\n\n\n")
         return '\n'
@@ -277,13 +320,24 @@ print("\033[31mType Size of the World\033[0m\n")
 world = terra(int(input()))
 print("New World is created\n")
 while True:
-    s = input().split()
-    if len(s) == 2:
-        a, b = map(int, s)
+    s = input()
+    if s == 'go_to':
+        a, b = map(int, input().split())
+        world.go_to(a, b)
         world.Print(a, b)
-    elif len(s) == 3:
-        print("here there is ")
-        colored.colored_print(\
-        world.area[int(s[1])][int(s[2])].t, '\n', "dark_blue", 0, "gray", 1, [])
-        print("hight ")
-        colored.colored_print(str(world.area[int(s[1])][int(s[2])].height),'\n',  "green", 0, "gray", 1, [])
+    if s == 'up':
+        world.move(-1, 0)
+        world.look()
+    elif s == 'left':
+        world.move(0, -1)
+        world.look()
+    elif s == 'right':
+        world.move(0, 1)
+        world.look()
+    elif s == 'down':
+        world.move(1, 0)
+        world.look()
+    elif s == 'look':
+        world.look()
+    elif s == "print":
+       world.Print(*world.coord) 
