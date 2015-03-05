@@ -103,6 +103,18 @@ def do_segments_intersect(a, b, c, d):
                cross_product(vector(c, d), vector(c, b)) > 0
 
 
+def do_segment_and_hor_ray_intersect(p, a, b):
+    q = p[0] + 1, p[1]
+    if dot_product(vector(p, q), vector(p, a)) < 0 and \
+       dot_product(vector(p, q), vector(p, b)) < 0:
+        return False
+    if
+
+
+def is_point_in_polygon(p, lst):
+    
+
+
 class random_polygon:
     """Constructor args:
        self: no comments

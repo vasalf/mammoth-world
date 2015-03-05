@@ -1,0 +1,17 @@
+Type Size of the World
+
+100
+253
+64
+37
+210
+179
+Traceback (most recent call last):
+  File "../W1/World/relief_wood_lake_river.py", line 257, in <module>
+    world = terra(int(input()))
+  File "../W1/World/relief_wood_lake_river.py", line 229, in __init__
+    generate(self.area, i, j, square(choice(['S', '~', 'T', mountain]))))
+  File "../W1/World/relief_wood_lake_river.py", line 189, in generate
+    (arr[i + moves[idx][0]][j + moves[idx][1]].t == "water lake" or\
+
+IndexError: list index out of range
