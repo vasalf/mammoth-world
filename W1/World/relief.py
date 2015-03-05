@@ -287,14 +287,6 @@ class terra:
             generate(self.area, i, j, square(choice(['S', 'T'])), 1)
     def go_to(self, x, y):
         self.objects[0].go_to(x, y)
-    def move(self, dx, dy, obj=0):
-        if obj == 0:
-            obj = self.objects[0]
-        if 0 <= obj.x + dx < self.size and 0 <= obj.y + dy < self.size:
-
-            obj.x += dx
-            obj.y += dy
-#            print(self.coord[0], self.coord[1])
     def look(self, obj=0):
         if obj == 0:
             obj = self.objects[0]
@@ -310,8 +302,8 @@ class terra:
     def Print(self, obj):
         os.system("clear")
         x, y = obj.x, obj.y
-        x1 = max(x - 50, 0)
-        x2 = min(x + 50, self.size)
+        x1 = max(x - 15, 0)
+        x2 = min(x + 15, self.size)
         y1 = max(y - 50, 0)
         y2 = min(y + 50, self.size)
         arr = list(map(lambda a: (a.x, a.y), self.objects))
@@ -340,23 +332,33 @@ while True:
         world.go_to(a, b)
         world.Print(world.objects[0])
     if s == 'up':
-        world.move(-1, 0)
+        world.objects[0].move(-1, 0)
+        world.Print(world.objects[0]) 
         world.look()
     elif s == 'left':
-        world.move(0, -1)
+        world.objects[0].move(0, -1)
+        world.Print(world.objects[0]) 
         world.look()
     elif s == 'right':
-        world.move(0, 1)
+        world.objects[0].move(0, 1)
+        world.Print(world.objects[0]) 
         world.look()
     elif s == 'down':
-        world.move(1, 0)
+        world.objects[0].move(1, 0)
+        world.Print(world.objects[0]) 
         world.look()
     elif s == 'look':
         world.look()
+    elif s == "new":
+        s = input().split()
+        world.objects.append(objects.obj(s[0], world.size))
+        world.objects[-1].go_to(int(s[1]), int(s[2]))
+
     elif s == "print":
-        world.Print(world.objects[0]) 
+        world.Print(world.objects[0])
     elif s == "turn":
         
         for obj in world.objects:
             obj.turn()
-        Print()
+
+        world.Print(world.objects[0]) 
