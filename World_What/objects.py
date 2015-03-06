@@ -10,10 +10,10 @@ class obj:
         self.size = size
 
 #All types should be possible on default
-    def move(self, world, dx, dy=0, Possible={'ground', 'tree', 'sea water', 'water lake', 'water river', 'ice-berg', 'mountain'}):
+    def move(self, world, dx=0, dy=0, Possible={'ground', 'tree', 'sea water', 'water lake', 'water river', 'ice-berg', 'mountain'}):
         if isinstance(dx, tuple):
             dx, dy = dx
-        if (0 <= self.x + dx < self.size) and (0 <= self.y + dy < self.size) and world.area[self.x + dx][self.y + dy] in Possible:
+        if (0 <= self.x + dx < world.size) and (0 <= self.y + dy < world.size) and (world.area[self.x + dx][self.y + dy].t in Possible):
             self.x += dx
             self.y += dy
             return True
@@ -23,8 +23,9 @@ class obj:
         self.y = y
     def __str__(self):
         return self.c
-    def turn(self, world):
-        return
+    #def turn(self, world):
+    
+     #   return
     def color_args(self):
         return colored[self.c]
 
