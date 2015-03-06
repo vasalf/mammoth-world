@@ -154,7 +154,7 @@ def is_point_in_polygon(p, lst):
            do_segment_and_hor_ray_intersect(p, lst[i], lst[i - 1]):
             num += 1
         elif lst[i - 1][1] < lst[i][1] and \
-             do_segment_and_hor_ray_intersect(r, pg[i], pg[i + 1]):
+             do_segment_and_hor_ray_intersect(p, lst[i - 1], lst[i]):
             num += 1
            
     return (num & 1) == 1
@@ -186,7 +186,7 @@ class random_polygon:
     def is_point_strongly_in(self, p, res = None):
         if res is None:
             res = self
-        return is_point_in_polygon(p, lst) and \
+        return is_point_in_polygon(p, res) and \
                not self.__is_point_in_borders(p, res)
 
     def __is_segment_strongly_intersecting_borders(self, a, b, res = None):
@@ -215,6 +215,7 @@ class random_polygon:
 
     def __is_intersecting(self, p, a, b):
         if self.__is_segment_intersecting_borders(a, b, p):
+            print("i", p)
             return True
         if self.__is_point_in_borders(a, p) and \
            self.__is_point_in_borders(b, p):
@@ -230,6 +231,7 @@ class random_polygon:
             res = self
         for p in system:
             if self.__is_intersecting(p, a, b):
+                print(p)
                 return True
         return False
 
@@ -254,7 +256,7 @@ class random_polygon:
             for i in range(NUM):
                 trial = 0
                 generated = False
-                while not generated and trial < 10:
+                while not generated and trial < 10:    
                     k = randint(0, len(res) - 1)
                     mn_x = min(res[k][0], res[k - 1][0])
                     mx_x = max(res[k][0], res[k - 1][0])
@@ -272,6 +274,12 @@ class random_polygon:
                         y = randint(mn_y, mx_y)
                     
                     p = (x, y)
+                    print("====== Trial %02d ======" % trial)
+                    print()
+                    print(p)
+                    print(res[k], res[k - 1])
+                    print(self.__is_intersecting_system(res[k], p, must_be_in))
+                    print()
                     if p != res[k] and p != res[k - 1] and \
                        not self.__is_intersecting_system(res[k], p, \
                            must_be_in) and \
@@ -284,7 +292,6 @@ class random_polygon:
                         generated = True
                         res = res[:k] + [p] + res[k:]
                     trial += 1
-                    print()
             self.__points = res
 
     def __len__(self):
