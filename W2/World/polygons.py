@@ -119,12 +119,10 @@ def do_segments_strongly_intersect(a, b, c, d):
         if c == d:
             return not is_point_in_segment(c, a, b) and \
                    not is_point_in_segment(a, c, d)
-        return not is_point_in_segment(a, c, d) and \
-               not is_point_in_segment(b, c, d) and \
-               not is_point_in_segment(c, a, b) and \
-               not is_point_in_segment(d, a, b)
-    else:
-        return False
+    return not is_point_in_segment(a, c, d) and \
+           not is_point_in_segment(b, c, d) and \
+           not is_point_in_segment(c, a, b) and \
+           not is_point_in_segment(d, a, b)
 
 
 def signum(a):
@@ -214,8 +212,12 @@ class random_polygon:
                 return True
         return False
 
-    def __is_intersecting(self, p, a, b):
+    def __is_intersecting(self, p, a, b, i = None):
+#        if a == (19, 18) or b == (19, 18):
+#            print("Botva", a, b, i)
         if self.__is_segment_strongly_intersecting_borders(a, b, p):
+#            if a == (19, 18) or b == (19, 18):
+#                print("smth")
             return True
         if self.__is_point_in_borders(a, p) and \
            self.__is_point_in_borders(b, p):
@@ -231,7 +233,7 @@ class random_polygon:
             res = self
         i = 0
         for p in system: 
-            if self.__is_intersecting(p, a, b):
+            if self.__is_intersecting(p, a, b, i):
 #                print(i)
                 return True
             i += 1
@@ -256,7 +258,8 @@ class random_polygon:
 #            NUM = 2 * (ru[0] - ld[0] + ru[1] - ld[1])
             NUM = 10
             for i in range(NUM):
-                seed(179)
+#                print((19, 18) in res)
+#                seed(179)
                 trial = 0
                 generated = False
                 while not generated and trial < 100:    
@@ -277,6 +280,8 @@ class random_polygon:
                         y = randint(mn_y, mx_y)
                     
                     p = (x, y)
+#                    if p == (19, 18):
+#                        print(p in res)
 #                    print("====== Trial %02d ======" % trial)
 #                    print()
 #                    print(p)
@@ -284,17 +289,18 @@ class random_polygon:
 #                    print(self.__is_intersecting_system(res[k], p, must_be_in))
 #                    print()
 
-                    if p != res[k] and p != res[k - 1] and \
-                       not self.__is_intersecting_system(res[k], p, \
-                           must_be_in) and \
-                       not self.__is_intersecting_system(p, res[k - 1], \
-                           must_be_in) and \
-                       not self.__is_segment_strongly_intersecting_borders(
-                                res[k], p, res) and \
-                       not self.__is_segment_strongly_intersecting_borders(
-                                res[k - 1], p, res):
+                    if (p != res[k]) and (p != res[k - 1]) and \
+                       (not self.__is_intersecting_system(res[k], p, \
+                           must_be_in)) and \
+                       (not self.__is_intersecting_system(p, res[k - 1], \
+                           must_be_in)) and \
+                       (not self.__is_segment_strongly_intersecting_borders(
+                                res[k], p, res)) and \
+                       (not self.__is_segment_strongly_intersecting_borders(
+                                res[k - 1], p, res)):
                         generated = True
                         res = res[:k] + [p] + res[k:]
+#                        print(p, res[k - 1], res[k + 1])
                     trial += 1
             self.__points = res
 
