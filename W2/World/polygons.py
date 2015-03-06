@@ -29,6 +29,7 @@ def sq_point_distance(a, b):
     y = a[1] - b[1]
     return x * x + y * y
 
+
 def vector(a, b):
     return (b[0] - a[0], b[1] - a[1])
 
@@ -45,12 +46,12 @@ class __sorted_by_polar_angle_point:
         return self.__pt[i]
 
     def __lt__(self, other):
-        if cross_product(vector(self.__first, self), \
+        if cross_product(vector(self.__first, self),
                          vector(self.__first, other)) == 0:
             return sq_point_distance(self.__first, self) < \
                    sq_point_distance(self.__first, other)
         else:
-            return cross_product(vector(self.__first, self), \
+            return cross_product(vector(self.__first, self),
                                  vector(self.__first, other)) > 0
 
         def __tuple__(self):
@@ -85,6 +86,11 @@ def unite(lst):
     return res
 
 
+"""Here are some geometry helper functions
+
+"""
+
+
 def is_point_in_segment(p, a, b):
     return cross_product(vector(p, a), vector(p, b)) == 0 and \
            dot_product(vector(p, a), vector(p, b)) <= 0
@@ -93,7 +99,7 @@ def is_point_in_segment(p, a, b):
 def do_segments_intersect(a, b, c, d):
     if cross_product(vector(a, b), vector(c, d)) == 0:
         return is_point_in_segment(a, c, d) or \
-               is_point_in_segment(b, c ,d) or \
+               is_point_in_segment(b, c, d) or \
                is_point_in_segment(c, a, b) or \
                is_point_in_segment(d, a, b)
     else:
@@ -120,9 +126,9 @@ def do_segments_strongly_intersect(a, b, c, d):
             return not is_point_in_segment(c, a, b) and \
                    not is_point_in_segment(a, c, d)
     return not is_point_in_segment(a, c, d) and \
-           not is_point_in_segment(b, c, d) and \
-           not is_point_in_segment(c, a, b) and \
-           not is_point_in_segment(d, a, b)
+        not is_point_in_segment(b, c, d) and \
+        not is_point_in_segment(c, a, b) and \
+        not is_point_in_segment(d, a, b)
 
 
 def signum(a):
@@ -139,8 +145,8 @@ def do_segment_and_hor_ray_intersect(p, a, b):
     if b[1] == p[1]:
         return False
     return signum(cross_product(vector(p, q), vector(p, a))) != \
-           signum(cross_product(vector(p, q), vector(p, b))) and \
-           cross_product(vector(p, a), vector(p, b)) > 0
+        signum(cross_product(vector(p, q), vector(p, b))) and \
+        cross_product(vector(p, a), vector(p, b)) > 0
 
 
 def is_point_in_polygon(p, lst):
@@ -154,7 +160,7 @@ def is_point_in_polygon(p, lst):
            do_segment_and_hor_ray_intersect(p, lst[i], lst[i - 1]):
             num += 1
         elif lst[i - 1][1] < lst[i][1] and \
-             do_segment_and_hor_ray_intersect(p, lst[i - 1], lst[i]):
+                do_segment_and_hor_ray_intersect(p, lst[i - 1], lst[i]):
             num += 1
     return (num & 1) == 1
 
@@ -174,7 +180,7 @@ class random_polygon:
                    generated polygon
 
     """
-    def __is_point_in_borders(self, p, res = None):
+    def __is_point_in_borders(self, p, res=None):
         if res is None:
             res = self
         for i in range(len(res)):
@@ -182,13 +188,13 @@ class random_polygon:
                 return True
         return False
 
-    def is_point_strongly_in(self, p, res = None):
+    def is_point_strongly_in(self, p, res=None):
         if res is None:
             res = self
         return is_point_in_polygon(p, res) and \
-               not self.__is_point_in_borders(p, res)
+            not self.__is_point_in_borders(p, res)
 
-    def __is_segment_strongly_intersecting_borders(self, a, b, res = None):
+    def __is_segment_strongly_intersecting_borders(self, a, b, res=None):
         if res is None:
             res = self
         for i in range(len(res)):
@@ -196,7 +202,7 @@ class random_polygon:
                 return True
         return False
 
-    def __is_segment_intersecting_borders(self, a, b, res = None):
+    def __is_segment_intersecting_borders(self, a, b, res=None):
         if res is None:
             res = self
         for i in range(len(res)):
@@ -204,7 +210,7 @@ class random_polygon:
                 return True
         return False
 
-    def __does_segment_contain_a_vertice(self, a, b, res = None):
+    def __does_segment_contain_a_vertice(self, a, b, res=None):
         if res is None:
             res = self
         for p in res:
@@ -212,7 +218,7 @@ class random_polygon:
                 return True
         return False
 
-    def __is_intersecting(self, p, a, b, i = None):
+    def __is_intersecting(self, p, a, b, i=None):
         if self.__is_segment_strongly_intersecting_borders(a, b, p):
             return True
         if self.__is_point_in_borders(a, p) and \
@@ -224,11 +230,11 @@ class random_polygon:
             return True
         return False
 
-    def __is_intersecting_system(self, a, b, system, res = None):
+    def __is_intersecting_system(self, a, b, system, res=None):
         if res is None:
             res = self
         i = 0
-        for p in system: 
+        for p in system:
             if self.__is_intersecting(p, a, b, i):
                 return True
             i += 1
@@ -257,34 +263,34 @@ class random_polygon:
             for i in range(NUM):
                 trial = 0
                 generated = False
-                while not generated and trial < 100:    
+                while not generated and trial < 100:
                     k = randint(0, len(res) - 1)
                     mn_x = min(res[k][0], res[k - 1][0])
                     mx_x = max(res[k][0], res[k - 1][0])
                     mn_y = min(res[k][1], res[k - 1][1])
                     mx_y = max(res[k][1], res[k - 1][1])
                     if mn_x == mx_x:
-                        x = randint(mn_x - (ru[0] - ld[0] + 9) // 10, \
+                        x = randint(mn_x - (ru[0] - ld[0] + 9) // 10,
                                     mn_x + (ru[0] - ld[0] + 9) // 10)
                     else:
                         x = randint(mn_x, mx_x)
                     if mn_y == mx_y:
-                        y = randint(mn_y - (ru[1] - ld[1] + 9) // 10, \
+                        y = randint(mn_y - (ru[1] - ld[1] + 9) // 10,
                                     mn_y + (ru[1] - ld[1] + 9) // 10)
                     else:
                         y = randint(mn_y, mx_y)
-                    
+
                     p = (x, y)
 
                     if (p != res[k]) and (p != res[k - 1]) and \
-                       (not self.__is_intersecting_system(res[k], p, \
-                           must_be_in)) and \
-                       (not self.__is_intersecting_system(p, res[k - 1], \
-                           must_be_in)) and \
+                       (not self.__is_intersecting_system(res[k], p,
+                        must_be_in)) and \
+                       (not self.__is_intersecting_system(p, res[k - 1],
+                        must_be_in)) and \
                        (not self.__is_segment_strongly_intersecting_borders(
-                                res[k], p, res)) and \
+                        res[k], p, res)) and \
                        (not self.__is_segment_strongly_intersecting_borders(
-                                res[k - 1], p, res)) and \
+                        res[k - 1], p, res)) and \
                        self.__is_in_borders(ld, ru, p) and \
                        not self.__is_point_in_borders(p, res):
                         generated = True
@@ -306,22 +312,3 @@ class random_polygon:
 
     def __list__(self):
         return self.__points
-
-
-n = int(input())
-inner = []
-for i in range(n):
-    k = int(input())
-    poly = []
-    for i in range(k):
-        poly.append(tuple(map(int, input().split())))
-    inner.append(random_polygon(poly))
-
-
-poly = random_polygon(1, ((0, 0), (30, 30)), inner)
-print(poly)
-for p in inner:
-    for k in p:
-        if not is_point_in_polygon(k, poly):
-            print("Err:", k)
-
