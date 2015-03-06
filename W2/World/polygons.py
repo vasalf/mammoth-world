@@ -87,7 +87,7 @@ def unite(lst):
 
 def is_point_in_segment(p, a, b):
     return cross_product(vector(p, a), vector(p, b)) == 0 and \
-           dot_product(vector(p, a), vector(p, b)) < 0
+           dot_product(vector(p, a), vector(p, b)) <= 0
 
 
 def do_segments_intersect(a, b, c, d):
@@ -141,13 +141,15 @@ def do_segment_and_hor_ray_intersect(p, a, b):
     if b[1] == p[1]:
         return False
     return signum(cross_product(vector(p, q), vector(p, a))) != \
-           signum(cross_product(vector(p, q), vector(p, b))) <= 0 and \
+           signum(cross_product(vector(p, q), vector(p, b))) and \
            cross_product(vector(p, a), vector(p, b)) > 0
 
 
 def is_point_in_polygon(p, lst):
     num = 0
     for i in range(len(lst)):
+        if is_point_in_segment(p, lst[i - 1], lst[i]):
+            return True
         if lst[i][1] == lst[i - 1][1]:
             continue
         if lst[i - 1][1] > lst[i][1] and \
@@ -156,7 +158,6 @@ def is_point_in_polygon(p, lst):
         elif lst[i - 1][1] < lst[i][1] and \
              do_segment_and_hor_ray_intersect(p, lst[i - 1], lst[i]):
             num += 1
-           
     return (num & 1) == 1
 
 
@@ -214,8 +215,7 @@ class random_polygon:
         return False
 
     def __is_intersecting(self, p, a, b):
-        if self.__is_segment_intersecting_borders(a, b, p):
-            print("i", p)
+        if self.__is_segment_strongly_intersecting_borders(a, b, p):
             return True
         if self.__is_point_in_borders(a, p) and \
            self.__is_point_in_borders(b, p):
@@ -229,10 +229,12 @@ class random_polygon:
     def __is_intersecting_system(self, a, b, system, res = None):
         if res is None:
             res = self
-        for p in system:
+        i = 0
+        for p in system: 
             if self.__is_intersecting(p, a, b):
-                print(p)
+#                print(i)
                 return True
+            i += 1
         return False
 
     def __init__(self, arg, borders=None, must_be_in=None):
@@ -252,11 +254,12 @@ class random_polygon:
 
             res = convex(unite(must_be_in))
 #            NUM = 2 * (ru[0] - ld[0] + ru[1] - ld[1])
-            NUM = 1
+            NUM = 10
             for i in range(NUM):
+                seed(179)
                 trial = 0
                 generated = False
-                while not generated and trial < 10:    
+                while not generated and trial < 100:    
                     k = randint(0, len(res) - 1)
                     mn_x = min(res[k][0], res[k - 1][0])
                     mx_x = max(res[k][0], res[k - 1][0])
@@ -274,21 +277,22 @@ class random_polygon:
                         y = randint(mn_y, mx_y)
                     
                     p = (x, y)
-                    print("====== Trial %02d ======" % trial)
-                    print()
-                    print(p)
-                    print(res[k], res[k - 1])
-                    print(self.__is_intersecting_system(res[k], p, must_be_in))
-                    print()
+#                    print("====== Trial %02d ======" % trial)
+#                    print()
+#                    print(p)
+#                    print(res[k], res[k - 1])
+#                    print(self.__is_intersecting_system(res[k], p, must_be_in))
+#                    print()
+
                     if p != res[k] and p != res[k - 1] and \
                        not self.__is_intersecting_system(res[k], p, \
                            must_be_in) and \
                        not self.__is_intersecting_system(p, res[k - 1], \
                            must_be_in) and \
-                       not self.__is_segment_intersecting_borders(res[k], \
-                                                                  p) and \
-                       not self.__is_segment_intersecting_borders(res[k - 1], \
-                                                                  p):
+                       not self.__is_segment_strongly_intersecting_borders(
+                                res[k], p, res) and \
+                       not self.__is_segment_strongly_intersecting_borders(
+                                res[k - 1], p, res):
                         generated = True
                         res = res[:k] + [p] + res[k:]
                     trial += 1
@@ -325,5 +329,5 @@ print(poly)
 for p in inner:
     for k in p:
         if not is_point_in_polygon(k, poly):
-            print("E:", k)
+            print("Err:", k)
 
