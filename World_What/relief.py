@@ -220,7 +220,7 @@ class terra:
         global obj_large
         obj_large = int(SIZE ** 0.5 / 2)
         self.area = [[square(0)] * SIZE for i in range(SIZE)]
-        point = objects.obj('X', SIZE)
+        point = objects.obj('X', self)
         self.objects = [point]
         self.t = 25
         for i in range(SIZE):
@@ -271,8 +271,8 @@ class terra:
         print("Height = ", end = ' ')
         colored.colored_print(str(world.area[obj.x][obj.y].height),'\n',  "green", 0, "gray", 1, [])
         world.area[obj.x][obj.y].attributes = []
-            
-   
+  
+
     
     def Print(self, obj):
         os.system("clear")
@@ -296,15 +296,14 @@ class terra:
             colored.colored_print(str(i), '\n', 'red' if i == self.objects[0].x else "black", 0, "gray", 0, [])
         print(y1)
         return '\n'
-            
+      
 print("\033[31mType Size of the World\033[0m\n")
 world = terra(int(input()))
 print("New World is created\n")
 #==================
 #MAMMOTH GENERATION
-for new_mammoth in mammoth.generate_mammoth_herds(SIZE, world):
+for new_mammoth in mammoth.generate_mammoth_herds(world):
     world.objects.append(new_mammoth)
-    #world.area[new_mammoth.x][new_mammoth.y].obj = world.objects[-1]
 print("Mammoths generated\n")
 #==================
 while True:
@@ -314,31 +313,30 @@ while True:
         world.go_to(a, b)
         world.Print(world.objects[0])
     if s == 'up':
-        print(world.objects[0].move(world, -1, 0))
+        print(world.objects[0].move(-1, 0))
         world.Print(world.objects[0]) 
         world.look()
     elif s == 'left':
-        print(world.objects[0].move(world, 0, -1))
+        print(world.objects[0].move(0, -1))
         world.Print(world.objects[0]) 
         world.look()
     elif s == 'right':
-        print(world.objects[0].move(world, 0, 1))
+        print(world.objects[0].move(0, 1))
         world.Print(world.objects[0]) 
         world.look()
     elif s == 'down':
-        print(world.objects[0].move(world, 1, 0))
+        print(world.objects[0].move(1, 0))
         world.Print(world.objects[0]) 
         world.look()
     elif s == 'look':
         world.look()
     elif s == "new":
         s = input().split()
-        world.objects.append(objects.obj(s[0], world.size))
+        world.objects.append(objects.obj(s[0], world))
         world.objects[-1].go_to(int(s[1]), int(s[2]))
-
     elif s == "print":
         world.Print(world.objects[0])
-    elif s == "turn":
+    elif s == "turn" or s == 't':
         for obj in world.objects[1:]:
             obj.turn(world)
         world.Print(world.objects[0])
