@@ -8,9 +8,6 @@
 """
 
 import sys
-sys.path += "./helpers"
-
-import polygons as polygons
-import colored as colored
+sys.path += ["./helpers"]
 
 __author__ = "vasalf"
