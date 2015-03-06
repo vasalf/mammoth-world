@@ -80,14 +80,14 @@ class terra:
         i = 1
         while i < len(arr):
             if (obj.x, obj.y) == arr[i]:
-                world.area[obj.x][obj.y].attributes.append(self.objects[i])
+                self.area[obj.x][obj.y].attributes.append(self.objects[i])
             i += 1
         print("Here ", obj.x, obj.y, "There is", end = ' ')
         colored.colored_print(\
-        world.area[obj.x][obj.y].info(), '\n', "dark_blue", 0, "gray", 1, [])
+        self.area[obj.x][obj.y].info(), '\n', "dark_blue", 0, "gray", 1, [])
         print("Height = ", end = ' ')
-        colored.colored_print(str(world.area[obj.x][obj.y].height),'\n',  "green", 0, "gray", 1, [])
-        world.area[obj.x][obj.y].attributes = []
+        colored.colored_print(str(self.area[obj.x][obj.y].height),'\n',  "green", 0, "gray", 1, [])
+        self.area[obj.x][obj.y].attributes = []
                 
     def Print(self, obj):
         os.system("clear")

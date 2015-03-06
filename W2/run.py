@@ -5,6 +5,6 @@ import relief
 from square import square
 
 def gen(n):
-    return relief.terra([[square(0) for i in range(n)] for j in range(n)])
+    return relief.terra([[square('"') for i in range(n)] for j in range(n)])
 
 relief.interact_with_user(gen)
