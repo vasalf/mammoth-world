@@ -1,3 +1,13 @@
+
+grass = '`'
+swamp = ';'
+meadle = ':'
+simple = '"'
+mountain = '^'
+river = '~'
+sea = '~'
+tree = 'T'
+
 class square:
     def __init__(self, typ):
         self.c = typ if typ != 0 else ''
