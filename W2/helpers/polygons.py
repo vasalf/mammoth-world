@@ -251,9 +251,8 @@ class random_polygon:
             # Then just make a COPY of polygon
             self.__points = arg.__points[:]
         else:
-            # Then generate arg points
-            assert isinstance(arg, int)
-            assert arg > 0
+            # Then generate random points
+            assert arg is None
             assert borders is not None
             assert isinstance(must_be_in, list)
             ld, ru = borders
@@ -296,6 +295,8 @@ class random_polygon:
                         generated = True
                         res = res[:k] + [p] + res[k:]
                     trial += 1
+                if not generated:
+                    break
             self.__points = res
 
     def __len__(self):
