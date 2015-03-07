@@ -12,40 +12,41 @@ class mammothHerd():
 
 class mammoth(objects.obj):
     
-    def __init__(self, SIZE, ID, isLeader=False, age=0, hp=10, water=100, food=100):
-        objects.obj.__init__(self, 'M', SIZE)
+    def __init__(self, world, herdID, isLeader=False, age=0, hp=10, water=100, food=100):
+        objects.obj.__init__(self, 'M', world)
         self.age, self.hp, self.water, self.food = age, hp, water, food
-        self.ID = ID
+        self.herdID = herdID
         self.isLeader = isLeader
         if self.isLeader:
             self.moving_somewhere = False
+        self.world.area[self.x][self.y].obj = self
 
-    def wanderAround(self, world):
+    def wanderAround(self):
         dx, dy = choice(all_directions)
-        self.move(world, dx, dy, Passable)
+        self.move(dx, dy, Passable)
 
     def getLeaderCoord(self):
-        xy = Herds[self.ID].mammoths[0]
+        xy = Herds[self.herdID].mammoths[0]
         return xy.x, xy.y
 
     def getLeader(self):
-        ans = Herds[self.ID].mammoths[0]
+        ans = Herds[self.herdID].mammoths[0]
         return ans
 
     def dist(self, x, y):
         return abs(x - self.x) + abs(y - self.y)
 
-    def try_to_go(self, world, directions):
+    def try_to_go(self, directions):
         for direction in directions:
-            if self.move(world, direction, Passable):
+            if self.move(direction, Passable):
                 return
         for direction in all_directions:
-            if self.move(world, direction, Passable):
+            if self.move(direction, Passable):
                 return
         print("OMG I AM STUCK")
         return
 
-    def get_direction(self, world, x, y):
+    def get_direction(self, x, y):
         direction = []
         if x >= self.x and y >= self.y:
             direction.append((1, 1))
@@ -79,36 +80,36 @@ class mammoth(objects.obj):
             else:
                 direction.append((0, -1))
                 direction.append((-1, 0))
-        self.try_to_go(world, direction)
+        self.try_to_go(direction)
 
     
-    def move_to_leader(self, world):
-        self.get_direction(world, *self.getLeaderCoord())
+    def move_to_leader(self):
+        self.get_direction(*self.getLeaderCoord())
 
-    def followLeader(self, world):
+    def followLeader(self):
        x, y = self.getLeaderCoord()
        d = self.dist(x, y)
-       if self.getLeader().moving_somewhere or d > len(Herds[self.ID].mammoths) // 3:
-           self.move_to_leader(world)
+       if self.getLeader().moving_somewhere or d > len(Herds[self.herdID].mammoths) // 3:
+           self.move_to_leader()
        else:
-           self.wanderAround(world)
+           self.wanderAround()
 
     def turn(self, world):
         if self.isLeader:
-            self.wanderAround(world)
+            self.wanderAround()
         else:
-            self.followLeader(world)
+            self.followLeader()
 
-def generate_mammoth_herds(SIZE, world):
-    for ID in range(1):
-        for new in generate_mammoth_herd(SIZE, world, 6, ID):
+def generate_mammoth_herds(world):
+    for herdID in range(1):
+        for new in generate_mammoth_herd(world, 6, herdID):
             yield new
 
-def generate_mammoth_herd(SIZE, world, amount, ID):
+def generate_mammoth_herd(world, amount, herdID):
     herd = mammothHerd()
-    x, y = randrange(0, SIZE), randrange(0, SIZE)
+    x, y = randrange(0, world.size), randrange(0, world.size)
     while world.area[x][y].t not in Passable:
-        x, y = randrange(0, SIZE), randrange(0, SIZE)
+        x, y = randrange(0, world.size), randrange(0, world.size)
     around = [(1,1),(0,1),(-1,1),(1,0),(-1,0),(1,-1),(0,-1),(-1, -1)]
     oldest = True
     created = 0
@@ -117,10 +118,10 @@ def generate_mammoth_herd(SIZE, world, amount, ID):
     y_new = y
     while canCreate and amount > 0:
         if oldest:
-            new = create_mammoth(x, y, SIZE, ID, True)
+            new = create_mammoth(world, x, y, herdID, True)
             oldest = False
         else:
-            new = create_mammoth(x, y, SIZE, ID, False)
+            new = create_mammoth(world, x, y, herdID, False)
         herd.mammoths.append(new)
         yield new
         canCreate = False
@@ -133,8 +134,8 @@ def generate_mammoth_herd(SIZE, world, amount, ID):
     Herds.append(herd)
     #return herd
 
-def create_mammoth(x, y, SIZE, ID, oldest):
-    new = mammoth(SIZE, ID, True if oldest else False, randint(75, 95) if oldest else randint(0, 74))
+def create_mammoth(world, x, y, herdID, oldest):
+    new = mammoth(world, herdID, True if oldest else False, randint(75, 95) if oldest else randint(0, 74))
     new.go_to(x, y)
     return new
 

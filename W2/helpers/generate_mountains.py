@@ -26,7 +26,7 @@ sys.setrecursionlimit(100000)
 
 """
 
-def generate_massif(amount, wmap, x, y, last = (-1, 0)):
+def generate_massif(amount, wmap, x, y, last):
     if amount == 0:
         return 0
     directions = set([(-1, 0), (1, 0), (0, -1), (0, 1)])
@@ -39,7 +39,8 @@ def generate_massif(amount, wmap, x, y, last = (-1, 0)):
         if new_x >= 0 and new_y >= 0 and new_x < len(wmap) and \
           new_y < len(wmap) and not wmap[new_x][new_y]:
             wmap[new_x][new_y] = True
-            return 1 + generate_massif(amount - 1, wmap, new_x, new_y)
+            return 1 + generate_massif(amount - 1, wmap, new_x, new_y, 
+                next_direction)
         else:
             directions.remove(next_direction)
     return 0
@@ -49,7 +50,7 @@ def generate_massif(amount, wmap, x, y, last = (-1, 0)):
 - size is a world size
 - amount is number of mountains to create
 
-return value is a two-simensional boolean list
+return value is a two-dimensional boolean list
 
 """
 
@@ -59,5 +60,7 @@ def generate_mountains(size, amount):
         to_create = (random() ** 10) * amount
         x = randint(0, size - 1)
         y = randint(0, size - 1)
-        amount -= generate_massif(to_create, res, x, y)
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)] 
+        last = directions[randint(0, 3)]
+        amount -= generate_massif(to_create, res, x, y, last)
     return res
