@@ -1,5 +1,6 @@
 from random import *
 import objects
+from statusbar import statusbar
 
 Passable = {'ground', 'tree', 'mountain'}
 Herds = []
