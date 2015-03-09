@@ -29,10 +29,10 @@ sys.setrecursionlimit(100000)
 def generate_massif(amount, wmap, x, y, last):
     if amount == 0:
         return 0
-    directions = set([(-1, 0), (1, 0), (0, -1), (0, 1)])
+    directions = set([(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)])
     while len(directions):
         next_direction = last
-        if last not in directions or random() * 10 > 4:
+        if last not in directions or random() * 10 > 2:
             next_direction = sample(directions, 1)[0]
         new_x = x + next_direction[0]
         new_y = y + next_direction[1]
@@ -60,7 +60,7 @@ def generate_mountains(size, amount):
         to_create = (random() ** 10) * amount
         x = randint(0, size - 1)
         y = randint(0, size - 1)
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)] 
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)] 
         last = directions[randint(0, 3)]
         amount -= generate_massif(to_create, res, x, y, last)
     return res

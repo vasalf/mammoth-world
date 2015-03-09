@@ -101,8 +101,8 @@ class mammoth(objects.obj):
             self.followLeader()
 
 def generate_mammoth_herds(world):
-    for herdID in range(1):
-        for new in generate_mammoth_herd(world, 6, herdID):
+    for herdID in range(2):
+        for new in generate_mammoth_herd(world, 20, herdID):
             yield new
 
 def generate_mammoth_herd(world, amount, herdID):

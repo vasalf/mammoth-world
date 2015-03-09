@@ -114,12 +114,13 @@ class terra:
 
 
 def interact_with_user(terra_generator):
+    objects.Help()
     print("\033[31mType Size of the World\033[0m\n")
     world = terra_generator(int(input()))
     print("New World is created\n")
     #==================
     #MAMMOTH GENERATION
-    for new_mammoth in mammoth.generate_mammoth_herds(SIZE, world):
+    for new_mammoth in mammoth.generate_mammoth_herds(world):
         world.objects.append(new_mammoth)
         #world.area[new_mammoth.x][new_mammoth.y].obj = world.objects[-1]
     print("Mammoths generated\n")
@@ -131,19 +132,19 @@ def interact_with_user(terra_generator):
             world.go_to(a, b)
             world.Print(world.objects[0])
         if s == 'up':
-            print(world.objects[0].move(world, -1, 0))
+            print(world.objects[0].move(-1, 0))
             world.Print(world.objects[0]) 
             world.look()
         elif s == 'left':
-            print(world.objects[0].move(world, 0, -1))
+            print(world.objects[0].move(0, -1))
             world.Print(world.objects[0]) 
             world.look()
         elif s == 'right':
-            print(world.objects[0].move(world, 0, 1))
+            print(world.objects[0].move(0, 1))
             world.Print(world.objects[0]) 
             world.look()
         elif s == 'down':
-            print(world.objects[0].move(world, 1, 0))
+            print(world.objects[0].move(1, 0))
             world.Print(world.objects[0]) 
             world.look()
         elif s == 'look':
@@ -159,4 +160,11 @@ def interact_with_user(terra_generator):
             for obj in world.objects[1:]:
                 obj.turn(world)
             world.Print(world.objects[0])
+        elif s == "infinity_turns":
+            while True:
+                for obj in world.objects[1:]:
+                    obj.turn(world)
+                world.Print(world.objects[0])
+                __import__("time").sleep(0.5)
+   
 
