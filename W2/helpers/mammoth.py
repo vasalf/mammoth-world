@@ -102,7 +102,7 @@ class mammoth(objects.obj):
 
 def generate_mammoth_herds(world):
     for herdID in range(2):
-        for new in generate_mammoth_herd(world, 20, herdID):
+        for new in generate_mammoth_herd(world, 10, herdID):
             yield new
 
 def generate_mammoth_herd(world, amount, herdID):
@@ -116,26 +116,34 @@ def generate_mammoth_herd(world, amount, herdID):
     canCreate = True
     x_new = x
     y_new = y
+    hasCreated = True
     while canCreate and amount > 0:
         if oldest:
-            new = create_mammoth(world, x, y, herdID, True)
+            new, hasCreated = create_mammoth(world, x, y, herdID, True)
             oldest = False
         else:
-            new = create_mammoth(world, x, y, herdID, False)
-        herd.mammoths.append(new)
-        yield new
+            new, hasCreated = create_mammoth(world, x, y, herdID, False)
+        if hasCreated:
+            herd.mammoths.append(new)
+            yield new
+            amount -= 1
         canCreate = False
-        for dx, dy in around:
+        while not canCreate:
+            dx, dy = choice(around)
             if world.area[x + dx][y + dy].t in Passable:
                 canCreate = True
                 x_new, y_new = x + dx, y + dy
         x, y = x_new, y_new
-        amount -= 1
     Herds.append(herd)
     #return herd
 
 def create_mammoth(world, x, y, herdID, oldest):
+    if (world.area[x][y].obj != None):
+        return 0, False
+        
     new = mammoth(world, herdID, True if oldest else False, randint(75, 95) if oldest else randint(0, 74))
+
     new.go_to(x, y)
-    return new
+
+    return new, True
 
