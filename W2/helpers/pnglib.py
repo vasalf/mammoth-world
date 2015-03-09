@@ -1,10 +1,21 @@
 #!/usr/bin/python3
 
+"""This is a library that provides functions to work with PNG imaging worlds
+
+                It is a part of mammoth-world project
+              (https://github.com/vasalf/mammoth-world)
+
+"""
+
 import os
 os.system("cat helpers/necessary/png_warning.txt")
 import png
 import helpers
 from relief import terra
+
+"""A place to import modules is up to that comment
+
+"""
 
 png_viewer = "sxiv"
 

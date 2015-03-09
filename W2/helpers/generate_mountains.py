@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""This is a file that provides function that generates random mauntain massives
+"""This is a file that provides function that generates random mountain massives
 
                     It is a part of mammoth-world project
                   (https://github.com/vasalf/mammoth-world)
