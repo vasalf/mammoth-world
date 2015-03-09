@@ -258,16 +258,13 @@ class random_polygon:
             ld, ru = borders
 
             res = convex(unite(must_be_in))
-            NUM = 179 * (ru[0] - ld[0] + ru[1] - ld[1]) ** 2
+            NUM = 10
             for i in range(NUM):
-                trial = 0
-                generated = False
                 k = 0
-                for i in range(1, len(res)):
-                    if sq_point_distance(res[i], res[i - 1]) > \
-                      sq_point_distance(res[k], res[k - 1]):
-                        k = i
-                while not generated and trial < 10000:
+                while k < len(res):
+                    if sq_point_distance(res[k], res[k - 1]) <= 9:
+                        k += 1
+                        continue
                     mn_x = min(res[k][0], res[k - 1][0])
                     mx_x = max(res[k][0], res[k - 1][0])
                     mn_y = min(res[k][1], res[k - 1][1])
@@ -296,11 +293,9 @@ class random_polygon:
                         res[k - 1], p, res)) and \
                        self.__is_in_borders(ld, ru, p) and \
                        not self.__is_point_in_borders(p, res):
-                        generated = True
                         res = res[:k] + [p] + res[k:]
-                    trial += 1
-                if not generated:
-                    break
+                        k += 1
+                    k += 1
             self.__points = res
 
     def __len__(self):

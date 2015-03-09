@@ -16,8 +16,8 @@ def generate_world(n):
     res = [[square('~') for i in range(n)] for j in range(n)]
     # Mountains generation
     mountains = generate_mountains(3 * n // 4, 3 * n ** 2 // 64)
-    x_plus = randint(2, n // 4)
-    y_plus = randint(2, n // 4)
+    x_plus = randint(n // 16, 3 * n // 16)
+    y_plus = randint(n // 16, 3 * n // 16)
     for i in range(3 * n // 4):
         for j in range(3 * n // 4):
             if mountains[i][j]:
