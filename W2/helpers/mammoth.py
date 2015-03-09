@@ -102,9 +102,15 @@ class mammoth(objects.obj):
             self.followLeader()
 
 def generate_mammoth_herds(world):
-    for herdID in range(2):
+    NUM_HERDS = 2
+    sb = statusbar([("Generating mammoth herds", "")], clock_enabled=True)
+    print()
+    sb.Print()
+    for herdID in range(NUM_HERDS):
         for new in generate_mammoth_herd(world, 10, herdID):
             yield new
+        sb.update(1 / NUM_HERDS)
+    sb.finish()
 
 def generate_mammoth_herd(world, amount, herdID):
     herd = mammothHerd()

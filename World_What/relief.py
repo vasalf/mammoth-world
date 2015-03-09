@@ -349,7 +349,7 @@ while True:
         world.Print(world.objects[0])
         sys.stdout.flush()
         
-        print(world.log)
+        print("".join(world.log))
         sys.stderr.flush()
-        world.log = ''
+        world.log = []
 
