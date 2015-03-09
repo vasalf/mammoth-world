@@ -15,13 +15,11 @@ def point_triangle(p):
 def generate_world(n):
     res = [[square('~') for i in range(n)] for j in range(n)]
     # Mountains generation
-    mountains = generate_mountains(3 * n // 4, 3 * n ** 2 // 64)
-    x_plus = randint(n // 16, 3 * n // 16)
-    y_plus = randint(n // 16, 3 * n // 16)
-    for i in range(3 * n // 4):
-        for j in range(3 * n // 4):
+    mountains = generate_mountains(n, 3 * n ** 2 // 64)
+    for i in range(n):
+        for j in range(n):
             if mountains[i][j]:
-                res[i + x_plus][j + y_plus] = square('^')
+                res[i][j] = square('^')
     mountains_array = []
     for i in range(n):
         for j in range(n):

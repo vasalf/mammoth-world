@@ -57,17 +57,17 @@ def generate_mountains(size, amount):
     res = [[False for i in range(size)] for j in range(size)]
     while amount > 0:
         to_create = max(6 * int(random() * amount) // size, 1)
-        x = randint(0, size - 1)
-        y = randint(0, size - 1)
+        x = randint(size // 8, 7 * size // 8 - 1)
+        y = randint(size // 8, 7 * size // 8 - 1)
         direction = [0, 0]
         if x > size - x:
-            direction[0] = 1
-        else:
             direction[0] = -1
-        if y > size - y:
-            direction[1] = 1
         else:
+            direction[0] = 1
+        if y > size - y:
             direction[1] = -1
+        else:
+            direction[1] = 1
         direction = tuple(direction)
         directions = [(0, 1), (0, -1), (1, 0), (-1, 0), \
                       (1, 1), (1, -1), (-1, 1), (-1, -1)]
