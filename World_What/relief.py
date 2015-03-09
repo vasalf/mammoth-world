@@ -8,7 +8,7 @@ import colored
 import os
 import objects
 import mammoth
-
+from time import sleep
 sys.setrecursionlimit(100000)
 SIZE = 80
 obj_big = 30
@@ -212,6 +212,7 @@ class terra:
             self.area = SIZE
             return 
    ##
+        self.log = []
         self.size = SIZE
         global obj_small
         obj_small = int(SIZE ** (1.5) // 10)
@@ -336,8 +337,19 @@ while True:
         world.objects[-1].go_to(int(s[1]), int(s[2]))
     elif s == "print":
         world.Print(world.objects[0])
+    elif s == 'it':
+        while True:
+            for obj in world.objects[1:]:
+                obj.turn(world)
+            world.Print(world.objects[0])
+            sleep(1)
     elif s == "turn" or s == 't':
         for obj in world.objects[1:]:
             obj.turn(world)
         world.Print(world.objects[0])
+        sys.stdout.flush()
+        
+        print(world.log)
+        sys.stderr.flush()
+        world.log = ''
 
