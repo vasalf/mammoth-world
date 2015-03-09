@@ -18,7 +18,8 @@ def generate_world(n):
     stat_bar = statusbar([
         ("Generating mountains", "Finished generating mountains"),
         ("Generating world shape", "Finished generating world shape"),
-        ("Making world map", "Finished making world map")])
+        ("Making world map", "Finished making world map")],
+        clock_enabled=True)
     stat_bar.Print()
     # Mountains generation
     mountains = generate_mountains(n, 3 * n ** 2 // 64, stat_bar)

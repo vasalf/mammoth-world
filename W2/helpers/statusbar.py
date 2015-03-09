@@ -8,6 +8,7 @@
 """
 
 import sys
+from time import clock
 
 """A place to import modules is up to that comment.
 
@@ -17,12 +18,15 @@ __author__ = "vasalf"
 
 
 class statusbar:
-    def __init__(self, classes, length=25, task_length=25):
+    def __init__(self, classes, length=25, task_length=25, clock_enabled=False):
         self.classes = classes
         self.state = 0
         self.state_status = 0
         self.length = length
         self.task_length = 25
+        self.start_time = clock()
+        self.cur_start_time = clock()
+        self.clock_enabled = clock_enabled
 
     def __get_string(self, status):
         res = str(int(100 * status)).rjust(3, " ") + "% ["
@@ -50,7 +54,11 @@ class statusbar:
         print()
         print(self.classes[self.state][1])
         self.state += 1
+        if self.clock_enabled:
+            print("(time: " + str(round(clock() - self.cur_start_time, 3)) + " s)")
+            self.cur_start_time = clock()
         if self.state < len(self.classes):
             self.state_status = 0
             self.Print()
-
+        elif self.clock_enabled:
+            print("Total: " + str(round(clock() - self.start_time, 3)) + " s")
