@@ -244,7 +244,7 @@ class random_polygon:
     def __is_in_borders(self, ld, ru, p):
         return ld[0] <= p[0] <= ru[0] and ld[1] <= p[1] <= ru[1]
 
-    def __init__(self, arg, borders=None, must_be_in=None):
+    def __init__(self, arg, borders=None, must_be_in=None, stat_bar=None):
         if isinstance(arg, list):
             # Then just make a polygon from list
             self.__points = arg[:]
@@ -297,7 +297,11 @@ class random_polygon:
                         res = res[:k] + [p] + res[k:]
                         k += 1
                     k += 1
+                if stat_bar is not None:
+                    stat_bar.update(1 / NUM)
             self.__points = res
+            if stat_bar is not None:
+                stat_bar.finish()
 
     def __len__(self):
         return len(self.__points)

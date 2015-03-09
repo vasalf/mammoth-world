@@ -44,7 +44,7 @@ def generate_massif(amount, wmap, x, y, directions):
             to_go.remove(next_direction)
     return 0
 
-"""That function generates some massifes on a world map
+"""That function generates some massives on a world map
 
 - size is a world size
 - amount is number of mountains to create
@@ -53,8 +53,9 @@ return value is a two-dimensional boolean list
 
 """
 
-def generate_mountains(size, amount):
+def generate_mountains(size, amount, stat_bar=None):
     res = [[False for i in range(size)] for j in range(size)]
+    first_amount = amount
     while amount > 0:
         to_create = max(6 * int(random() * amount) // size, 1)
         x = randint(size // 8, 7 * size // 8 - 1)
@@ -74,5 +75,10 @@ def generate_mountains(size, amount):
         directions += 5 * [direction]
         directions += 5 * [(direction[0], 0)]
         directions += 5 * [(0, direction[1])]
-        amount -= generate_massif(to_create, res, x, y, directions)
+        generated = generate_massif(to_create, res, x, y, directions)
+        amount -= generated
+        if stat_bar is not None:
+            stat_bar.update(generated / first_amount)
+    if stat_bar is not None:
+        stat_bar.finish()
     return res

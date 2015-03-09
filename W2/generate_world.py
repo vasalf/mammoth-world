@@ -6,6 +6,7 @@ from generate_mountains import generate_mountains
 from square import square
 from random import randint
 from polygons import random_polygon, is_point_in_polygon
+from statusbar import statusbar
 
 
 def point_triangle(p):
@@ -14,8 +15,13 @@ def point_triangle(p):
 
 def generate_world(n):
     res = [[square('~') for i in range(n)] for j in range(n)]
+    stat_bar = statusbar([
+        ("Generating mountains", "Finished generating mountains"),
+        ("Generating world shape", "Finished generating world shape"),
+        ("Making world map", "Finished making world map")])
+    stat_bar.Print()
     # Mountains generation
-    mountains = generate_mountains(n, 3 * n ** 2 // 64)
+    mountains = generate_mountains(n, 3 * n ** 2 // 64, stat_bar)
     for i in range(n):
         for j in range(n):
             if mountains[i][j]:
@@ -41,10 +47,14 @@ def generate_world(n):
             randint(3 * n // 4, 7 * n // 8)
     rd_tr = point_triangle(rd_pt)
     continent = random_polygon(None, borders=((0, 0), (n - 1, n - 1)), 
-        must_be_in=[mountains_array, lu_tr, ru_tr, ld_tr, rd_tr])
+        must_be_in=[mountains_array, lu_tr, ru_tr, ld_tr, rd_tr],
+        stat_bar=stat_bar)
+    # World map generation
     for i in range(n):
         for j in range(n):
             if is_point_in_polygon((i + 0.5, j + 0.5), continent):
                 if str(res[i][j]) != str(square('^')):
                     res[i][j] = square('"')
+        stat_bar.update(1 / n)
+    stat_bar.finish()
     return relief.terra(res)

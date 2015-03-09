@@ -1,6 +1,20 @@
 #!/usr/bin/python3
 
+"""This is a library that provides a class to print statusbars
+
+              It is a part of mammoth-world project
+            (https://github.com/vasalf/mammoth-world)
+
+"""
+
 import sys
+
+"""A place to import modules is up to that comment.
+
+"""
+
+__author__ = "vasalf"
+
 
 class statusbar:
     def __init__(self, classes, length=25, task_length=25):
@@ -39,23 +53,4 @@ class statusbar:
         if self.state < len(self.classes):
             self.state_status = 0
             self.Print()
-
-
-st = statusbar([("Task 1", "Finished task 1"), ("Task 2", "Finished task 2")])
-st.Print()
-
-from time import sleep
-
-for i in range(2):
-    sleep(0.5)
-    st.update(0.5)
-
-sleep(0.5)
-st.finish()
-
-for i in range(3):
-    st.update(1 / 3)
-    sleep(1)
-
-st.finish()
 
