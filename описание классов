@@ -5,5 +5,43 @@
   self.t2 -> дополнительная информация.
   self.attr -> будут храниться дрова, еда и тюдю
   self.obj -> есть ли кто в клетке
+
+
   
-  
+Класс statusbar
+
+Конструктор принимает параметры classes, length и task_length
+
+- classes - это список кортежей (task_description, print_when_finished), описывающих класс задач
+    task_description - строка, выводящаяся перед statusbar'ом
+    print_when_finished - строка, выводящаяся по завершении задачи
+- length - длина самого statusbar'а
+- task_length - длина, к которой кастуется task_description при выводе
+
+Кроме того, есть методы:
+
+- Print() - вывести statusbar. Обязательно сделать после создания.
+- update(k) - прибавить к статусу k.
+- finish() - завершить текущее задание.
+
+Пример:
+
+
+st = statusbar([("Task 1", "Finished task 1"), ("Task 2", "Finished task 2")])
+st.Print()
+
+from time import sleep
+
+for i in range(2):
+    sleep(0.5)
+    st.update(0.5)
+
+sleep(0.5)
+st.finish()
+
+for i in range(3):
+    st.update(1 / 3)
+    sleep(1)
+
+st.finish()
+
