@@ -8,6 +8,7 @@
 """
 
 from random import *
+import math
 
 """A place to import modules is up to that comment.
 
@@ -258,7 +259,7 @@ class random_polygon:
             ld, ru = borders
 
             res = convex(unite(must_be_in))
-            NUM = 10
+            NUM = int(2 * math.log(3 * (ru[0] - ld[0] + ru[1] - ld[1]) / 2, 2))
             for i in range(NUM):
                 k = 0
                 while k < len(res):
