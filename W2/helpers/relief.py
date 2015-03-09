@@ -64,7 +64,7 @@ color['^'] = [mountain, '', 'black', 0, 'gray', 0, ["light"]]
 
 class terra:
     def __init__(self, lst):
-        point = objects.obj('X', SIZE)
+        point = objects.obj('X', self)
         self.area = lst
         self.objects = [point]
         self.size = len(lst)

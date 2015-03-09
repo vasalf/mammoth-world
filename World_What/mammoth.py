@@ -38,10 +38,10 @@ class mammoth(objects.obj):
 
     def try_to_go(self, directions):
         for direction in directions:
-            if self.move(direction, Passable):
+            if self.move(direction, 0, Passable):
                 return
         for direction in all_directions:
-            if self.move(direction, Passable):
+            if self.move(direction, 0, Passable):
                 return
         print("OMG I AM STUCK")
         return
