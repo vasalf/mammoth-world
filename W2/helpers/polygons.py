@@ -295,7 +295,7 @@ class random_polygon:
                        self.__is_in_borders(ld, ru, p) and \
                        not self.__is_point_in_borders(p, res):
                         res = res[:k] + [p] + res[k:]
-                        k += 1
+#                        k += 1
                     k += 1
                 if stat_bar is not None:
                     stat_bar.update(1 / NUM)
