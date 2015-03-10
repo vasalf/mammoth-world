@@ -360,4 +360,8 @@ while True:
         sys.stdout.flush()
         
         sys.stderr.flush()
+    elif s == "info":
+        os.system("clear")
+        for obj in world.objects[1:]:
+            obj.info()
 

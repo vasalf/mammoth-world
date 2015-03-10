@@ -1,6 +1,7 @@
 from random import *
 import objects
 import sys
+from collections import defaultdict
 Passable = {'ground', 'tree', 'mountain'}
 Herds = []
 all_directions = [(1,1),(0,1),(-1,1),(1,0),(-1,0),(1,-1),(0,-1),(-1, -1)]
@@ -12,11 +13,10 @@ class mammothHerd():
 
 class mammoth(objects.obj):
     
-    def __init__(self, world, herdID, isLeader=False, age=0, hp=10, water=100, food=20):
+    def __init__(self, world, herdID, isLeader=False, age=0, hp=10, water=100, food=50):
         objects.obj.__init__(self, 'M', world)
         self.age, self.hp, self.water, self.food = age, hp, water, food
-        self.last = ''
-        self.busy = 0
+        self.last = [] 
         self.herdID = herdID
         self.isLeader = isLeader
         if self.isLeader:
@@ -34,9 +34,12 @@ class mammoth(objects.obj):
     def getLeader(self):
         ans = Herds[self.herdID].mammoths[0]
         return ans
-
+    def info(self):
+        print("in point", self.x, self.y)
+        print("f = ", self.food, "w = " + str(self.water))
+        print(' '.join(map(str, self.last)))
     def dist(self, x, y):
-        return abs(x - self.x) + abs(y - self.y)
+        return abs(x - self.x) + abs(y - self.y) - min(abs(x - self.x), abs(y - self.y)) // 2
 
     def try_to_go(self, directions):
         for direction in directions:
@@ -48,7 +51,7 @@ class mammoth(objects.obj):
         print("OMG I AM STUCK")
         return
 
-    def get_direction(self, x, y):
+    def move_to(self, x, y):
         direction = []
         if x >= self.x and y >= self.y:
             direction.append((1, 1))
@@ -88,16 +91,16 @@ class mammoth(objects.obj):
         a = randint(min(5, self.world.area[self.x][self.y].attributes["M-food"]) \
         , min(10, self.world.area[self.x][self.y].attributes["M-food"]))
         self.world.area[self.x][self.y].attributes["M-food"] -= a
-        self.food += int(a * 1.2)
+        self.food += int(a * 1.5)
     def drink(self):
         a = randint(min(self.world.area[self.x][self.y].attributes["water"], \
         5), min(10, self.world.area[self.x][self.y].attributes["water"]))
         self.world.area[self.x][self.y].attributes["water"] -= 1
-        self.water += int(a * 1.2)
+        self.water += int(a * 1.5)
         
         
     def move_to_leader(self):
-        self.get_direction(*self.getLeaderCoord())
+        self.move_to(*self.getLeaderCoord())
 
     def followLeader(self):
        x, y = self.getLeaderCoord()
@@ -108,56 +111,80 @@ class mammoth(objects.obj):
            self.wanderAround()
 
     def isHungry(self):
-        return self.food < 10
+        return self.food < 30
+    def Search(self, rad, obj):
+        x, y = self.x, self.y
+        used = defaultdict(int)
+        used[(x, y)] = 0
+        q = [(x, y)]
+        mx = self.world.area[x][y].attributes[obj]
+        res = (x, y)
+        for u in q:
+            if used[u] > rad:
+                continue
+            i, j = u
+            if self.world.area[i][j].attributes[obj] > mx and self.world.area[i][j].t in Passable:
+                res = (i, j)
+                mx = self.world.area[i][j].attributes[obj]
+            for dx, dy in all_directions:
+                if 0 <= i + dx < self.world.size and 0 <= j + dy < self.world.size and \
+                not used[(i + dx, j + dy)] == -1:
+                   used[(i + dx, j + dy)] = used[(i, j)] + 1
+                   q.append((i + dx, j + dy))
+        return res, used[res]
+
     def remove(self):
         self.world.area[self.x][self.y].obj = None
         arr = list(map(lambda x: (x.x, x.y), self.world.objects))
         self.world.objects.pop(arr.index((self.x, self.y)))
-    def isThursty(self):
+    def isThirsty(self):
         return self.water < 30
     def turn(self, world):
-        self.food -= randint(1, 3)
+        self.food -= randint(1, 2)
         self.water -= randint(1, 2)
+        if self.hp <= 0:
+            self.world.log.append("mammoth has died\n")
+            self.remove()
+
         if self.food <= 0:
-            self.world.log.append(("mammoth has died because he was hungry\n"))
-            self.remove()
-            return
+            self.hp -= randint(1, 2)
         if self.water <= 0:
-            self.world.log.append("mammoth has died because he was thursty\n")
-            self.remove()
-            return
+            self.hp -= randint(1, 2)
+        if len(self.last) != 0:
+            
+            exec("self." + self.last[-1][0])
+
+            self.last[-1][1] -= 1
+            if self.last[-1][1] == 0:
+                self.last.pop()
+            return 
+        if len(self.last) != 0:
+            exec("self." + self.last[-1][0])
+            self.last[-1][1] -= 1
+            if self.last[-1][1] == 0:
+                self.last.pop()
+            return 
 
         if self.isHungry():
             mx_food = world.area[self.x][self.y].attributes["M-food"]
             res = [0, 0]
-            for dx, dy in all_directions:
-                if world.area[self.x + dx][self.y + dy].obj == None and \
-                   world.area[self.x + dx][self.y + dy].attributes["M-food"] > mx_food \
-                   and world.area[self.x + dx][self.y + dy].t in Passable:
-                    mx_food = world.area[self.x + dx][self.y + dy].attributes["M-food"]
-                    res = dx, dy
-            self.move(res[0], res[1], Passable)
-            self.eat()
-            self.last = "eat()"
-            self.busy = 3
+            res, dist = self.Search(min(5, (self.food - 10) / 2), "M-food")
+            self.move_to(res[0], res[1])
+            self.last.append(["eat()", 2])
+            self.last.append(["move_to(" + str(res[0]) + "," + str(res[1]) + ")", dist - 1])
             return
-        if self.isThursty():
-            mx_water = world.area[self.x][self.y].attributes["water"]
-            res = [0, 0]
-            for dx, dy in all_directions:
-                if world.area[self.x + dx][self.y + dy].obj == None and \
-                   world.area[self.x + dx][self.y + dy].attributes["water"] > mx_water \
-                   and world.area[self.x + dx][self.y + dy].t in Passable:
-                    mx_water = world.area[self.x + dx][self.y + dy].attributes["water"]
-                    res = dx, dy
-            self.move(res[0], res[1], Passable)
-            self.drink()
-            self.last = "drink()"
-            self.busy = 3
+        if self.isThirsty():
+            res, dist = self.Search(min(5, (self.water - 10) / 2), "water") 
+            self.move_to(res[0], res[1])
+#            mx_water = world.area[self.x][self.y].attributes["water"]
+            self.last.append(["drink()", 2])
+            self.last.append(["move_to(" + str(res[0]) + "," + str(res[1]) + ")", dist - 1])
             return
-        if self.busy != 0:
-            exec("self." + self.last)
-            self.busy -= 1
+        if len(self.last) != 0:
+            exec("self." + self.last[-1][0])
+            self.last[-1][1] -= 1
+            if self.last[-1][1] == 0:
+                self.last.pop()
             return 
         
         if self.isLeader:
