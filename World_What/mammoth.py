@@ -90,10 +90,10 @@ class mammoth(objects.obj):
         self.world.area[self.x][self.y].attributes["M-food"] -= a
         self.food += int(a * 1.2)
     def drink(self):
-        a = randint(min(self.world.area[self.x][self.y].attributes["M-food"], \
+        a = randint(min(self.world.area[self.x][self.y].attributes["water"], \
         5), min(10, self.world.area[self.x][self.y].attributes["water"]))
-        self.world.area[self.x][self.y].attributes["M-food"] -= 1
-        self.food += int(a * 1.2)
+        self.world.area[self.x][self.y].attributes["water"] -= 1
+        self.water += int(a * 1.2)
         
         
     def move_to_leader(self):

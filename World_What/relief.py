@@ -210,6 +210,7 @@ class terra:
         self.coord = [0, 0]
         if type(SIZE) == list:
             self.area = SIZE
+            self.filling()
             return 
    ##
         self.log = []
@@ -255,6 +256,7 @@ class terra:
         for i in range(obj_small):
             i, j = randint(10, int(SIZE * 0.8)), randint(10, int(SIZE * 0.8))
             generate(self.area, i, j, square(choice(['S', 'T'])), 1)
+        self.filling()
     def go_to(self, x, y):
         self.objects[0].go_to(x, y)
     def look(self, obj=0):
@@ -262,19 +264,24 @@ class terra:
             obj = self.objects[0]
         arr = list(map(lambda a: (a.x, a.y), self.objects))
         i = 1
-        while i < len(arr):
-            if (obj.x, obj.y) == arr[i]:
-                self.area[obj.x][obj.y].attributes.append(self.objects[i])
-            i += 1
         print("Here ", obj.x, obj.y, "There is", end = ' ')
         colored.colored_print(\
         self.area[obj.x][obj.y].info(), '\n', "dark_blue", 0, "gray", 1, [])
         print("Height = ", end = ' ')
-        colored.colored_print(str(self.area[obj.x][obj.y].height),'\n',  "green", 0, "gray", 1, [])
-        self.area[obj.x][obj.y].attributes = []
-  
+        colored.colored_print(str(self.area[obj.x][obj.y].height),'\n',  \
+        "green", 0, "gray", 1, [])
+       # self.area[obj.x][obj.y].attributes = []
 
-    
+    def filling(self):
+     #   self.area[obj.x][obj.y].attributes = []
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.area[i][j].t == 'water lake' or \
+                   self.area[i][j].t == 'water river':
+                    for dx, dy in moves:
+                        if 0 <= dx + i < self.size and 0 <= dy + j < self.size:
+                            self.area[i + dx][j + dy].attributes["water"] += 20
+
     def Print(self, obj):
         os.system("clear")
         x, y = obj.x, obj.y
@@ -295,7 +302,10 @@ class terra:
                 else:
                     colored.colored_print(*color[str(self.area[i][j])])
             colored.colored_print(str(i), '\n', 'red' if i == self.objects[0].x else "black", 0, "gray", 0, [])
-        print(y1)
+        print(y1)        
+        print("".join(world.log), file=sys.stderr)
+        sys.stderr.flush()
+        world.log = []
         return '\n'
       
 print("\033[31mType Size of the World\033[0m\n")
@@ -349,7 +359,5 @@ while True:
         world.Print(world.objects[0])
         sys.stdout.flush()
         
-        print("".join(world.log))
         sys.stderr.flush()
-        world.log = []
 

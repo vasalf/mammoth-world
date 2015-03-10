@@ -1,4 +1,4 @@
-
+moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]
 grass = '`'
 swamp = ';'
 meadle = ':'
@@ -38,7 +38,7 @@ class square:
         self.attributes = {}
         self.attributes["M-food"] = 10 - 5 * (self.t2 == "swamp") - \
                                     9 * (self.t == "mountain") + \
-                                    10 * (self.t2 == "grass")
+                                    10 * (self.t2 == "grass" or self.t2 == "meadle")
         self.attributes["water"] = 5
         if self.t.split()[0] == "water":
             self.attributes["M-food"] = 0
@@ -51,5 +51,7 @@ class square:
 #        if self.atr
         return str(self.c)
     def info(self):
-        return (self.t + ', ' + (self.t2 + ', ') * bool(self.t2) + ', '.join(map(str, self.attributes))).rstrip(', ')
+        return (self.t + ', ' + (self.t2 + ', ') * bool(self.t2) + \
+               ', '.join(map(str, self.attributes.items()))).rstrip(', ') + \
+               ((', ' + str(self.obj)) if self.obj != None else '')
  
