@@ -259,25 +259,28 @@ class random_polygon:
             ld, ru = borders
 
             res = convex(unite(must_be_in))
-            NUM = int(2 * math.log(3 * (ru[0] - ld[0] + ru[1] - ld[1]) / 2, 2))
+            NUM = 1
             for i in range(NUM):
                 k = 0
+                trial = 0
                 while k < len(res):
-                    if sq_point_distance(res[k], res[k - 1]) <= 9:
+                    if sq_point_distance(res[k], res[k - 1]) <= 16:
                         k += 1
+                        trial = 0
+                        print(k)
                         continue
                     mn_x = min(res[k][0], res[k - 1][0])
                     mx_x = max(res[k][0], res[k - 1][0])
                     mn_y = min(res[k][1], res[k - 1][1])
                     mx_y = max(res[k][1], res[k - 1][1])
-                    if mn_x == mx_x:
-                        x = randint(mn_x - (ru[0] - ld[0] + 9) // 10,
-                                    mn_x + (ru[0] - ld[0] + 9) // 10)
+                    if mx_x - mn_x < 3:
+                        x = randint(mn_x - (ru[0] - ld[0] + 9) // 20,
+                                    mn_x + (ru[0] - ld[0] + 9) // 20)
                     else:
                         x = randint(mn_x, mx_x)
-                    if mn_y == mx_y:
-                        y = randint(mn_y - (ru[1] - ld[1] + 9) // 10,
-                                    mn_y + (ru[1] - ld[1] + 9) // 10)
+                    if mx_y - mn_y < 3:
+                        y = randint(mn_y - (ru[1] - ld[1] + 9) // 20,
+                                    mn_y + (ru[1] - ld[1] + 9) // 20)
                     else:
                         y = randint(mn_y, mx_y)
 
@@ -295,8 +298,11 @@ class random_polygon:
                        self.__is_in_borders(ld, ru, p) and \
                        not self.__is_point_in_borders(p, res):
                         res = res[:k] + [p] + res[k:]
-#                        k += 1
-                    k += 1
+                    trial += 1
+                    if trial == 100:
+                        trial = 0
+                        k += 1
+                        print(k)
                 if stat_bar is not None:
                     stat_bar.update(1 / NUM)
             self.__points = res
