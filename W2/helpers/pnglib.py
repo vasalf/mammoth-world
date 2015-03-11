@@ -9,6 +9,9 @@
 
 import os
 os.system("cat helpers/necessary/png_warning.txt")
+import sys
+if "PyPy" in sys.version:
+    sys.path += ["/usr/src/python-pypng-git/src/python-pypng/code"]
 import png
 import helpers
 from relief import terra
