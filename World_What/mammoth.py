@@ -53,6 +53,9 @@ class mammoth(objects.obj):
 
     def move_to(self, x, y):
         direction = []
+        if self.world.area[x][y].obj != None:
+            return False
+
         if x >= self.x and y >= self.y:
             direction.append((1, 1))
             if randint(0, 1) == 0:
@@ -92,11 +95,14 @@ class mammoth(objects.obj):
         , min(10, self.world.area[self.x][self.y].attributes["M-food"]))
         self.world.area[self.x][self.y].attributes["M-food"] -= a
         self.food += int(a * 1.5)
+        return a != 0
+
     def drink(self):
         a = randint(min(self.world.area[self.x][self.y].attributes["water"], \
         5), min(10, self.world.area[self.x][self.y].attributes["water"]))
         self.world.area[self.x][self.y].attributes["water"] -= 1
         self.water += int(a * 1.5)
+        return a != 0
         
         
     def move_to_leader(self):
@@ -114,7 +120,7 @@ class mammoth(objects.obj):
         return self.food < 30
     def Search(self, rad, obj):
         x, y = self.x, self.y
-        used = defaultdict(int)
+        used = dict()
         used[(x, y)] = 0
         q = [(x, y)]
         mx = self.world.area[x][y].attributes[obj]
@@ -128,7 +134,7 @@ class mammoth(objects.obj):
                 mx = self.world.area[i][j].attributes[obj]
             for dx, dy in all_directions:
                 if 0 <= i + dx < self.world.size and 0 <= j + dy < self.world.size and \
-                not used[(i + dx, j + dy)] == -1:
+                used.get((i + dx, j + dy), -1) == -1:
                    used[(i + dx, j + dy)] = used[(i, j)] + 1
                    q.append((i + dx, j + dy))
         return res, used[res]
@@ -150,19 +156,19 @@ class mammoth(objects.obj):
             self.hp -= randint(1, 2)
         if self.water <= 0:
             self.hp -= randint(1, 2)
+        while len(self.last) != 0 and self.last[-1][1] <= 0:
+            self.last.pop()
         if len(self.last) != 0:
             
-            exec("self." + self.last[-1][0])
-
-            self.last[-1][1] -= 1
-            if self.last[-1][1] == 0:
+            if not eval("self." + self.last[-1][0]):
                 self.last.pop()
-            return 
-        if len(self.last) != 0:
-            exec("self." + self.last[-1][0])
-            self.last[-1][1] -= 1
-            if self.last[-1][1] == 0:
-                self.last.pop()
+                if len(self.last) != 0:
+                    exec("self." + self.last[-1][0])
+                    self.last[-1][1] -= 1
+            else:
+                self.last[-1][1] -= 1
+                if self.last[-1][1] == 0:
+                    self.last.pop()
             return 
 
         if self.isHungry():
@@ -171,14 +177,14 @@ class mammoth(objects.obj):
             res, dist = self.Search(min(5, (self.food - 10) / 2), "M-food")
             self.move_to(res[0], res[1])
             self.last.append(["eat()", 2])
-            self.last.append(["move_to(" + str(res[0]) + "," + str(res[1]) + ")", dist - 1])
+            self.last.append(["move_to(" + str(res[0]) + "," + str(res[1]) + ")", self.dist(*res)])
             return
         if self.isThirsty():
             res, dist = self.Search(min(5, (self.water - 10) / 2), "water") 
             self.move_to(res[0], res[1])
 #            mx_water = world.area[self.x][self.y].attributes["water"]
             self.last.append(["drink()", 2])
-            self.last.append(["move_to(" + str(res[0]) + "," + str(res[1]) + ")", dist - 1])
+            self.last.append(["move_to(" + str(res[0]) + "," + str(res[1]) + ")", self.dist(*res)])
             return
         if len(self.last) != 0:
             exec("self." + self.last[-1][0])

@@ -362,6 +362,7 @@ while True:
         sys.stderr.flush()
     elif s == "info":
         os.system("clear")
-        for obj in world.objects[1:]:
-            obj.info()
+        for i in range(1, len(world.objects)):
+            obj = world.objects[i]
+            print(i), obj.info()
 

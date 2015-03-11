@@ -17,7 +17,7 @@ class obj:
             self.world.area[self.x][self.y].obj = None
             self.x += dx
             self.y += dy
-            print(Possible, self.world.area[self.x][self.y].t, self.world.area[self.x][self.y].t in Possible, sep = '\n')
+#            print(Possible, self.world.area[self.x][self.y].t, self.world.area[self.x][self.y].t in Possible, sep = '\n')
             self.world.area[self.x][self.y].obj = self
             return True
         return False
