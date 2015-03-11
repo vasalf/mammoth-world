@@ -260,52 +260,59 @@ class random_polygon:
             size = ru[0] - ld[0]
 
             res = convex(unite(must_be_in))
-            NUM = 1
-            for i in range(NUM):
-                k = 0
-                trial = 0
-                while k < len(res):
-                    if sq_point_distance(res[k], res[k - 1]) <= log(size, 2) * (16 / log(100, 2)):
-                        k += 1
-                        trial = 0
-                        print(k)
-                        continue
-                    mn_x = min(res[k][0], res[k - 1][0])
-                    mx_x = max(res[k][0], res[k - 1][0])
-                    mn_y = min(res[k][1], res[k - 1][1])
-                    mx_y = max(res[k][1], res[k - 1][1])
-                    if mx_x - mn_x < 3:
-                        x = randint(mn_x - (ru[0] - ld[0] + 9) // 20,
-                                    mn_x + (ru[0] - ld[0] + 9) // 20)
-                    else:
-                        x = randint(mn_x, mx_x)
-                    if mx_y - mn_y < 3:
-                        y = randint(mn_y - (ru[1] - ld[1] + 9) // 20,
-                                    mn_y + (ru[1] - ld[1] + 9) // 20)
-                    else:
-                        y = randint(mn_y, mx_y)
+            mem = res[:]
 
-                    p = (x, y)
+            k = 0
+            trial = 0
+            cur_t = 0
+            while k < len(res):
+                if sq_point_distance(res[k], res[k - 1]) <= 16:
+                    k += 1
+                    trial = 0
+                    if k < len(res) and mem[(cur_t + 1) % len(mem)] == res[k]:
+                        cur_t += 1
+                        if stat_bar is not None:
+                            stat_bar.update(1 / len(mem))
+                    continue
+                mn_x = min(res[k][0], res[k - 1][0])
+                mx_x = max(res[k][0], res[k - 1][0])
+                mn_y = min(res[k][1], res[k - 1][1])
+                mx_y = max(res[k][1], res[k - 1][1])
+                if mx_x - mn_x < 3:
+                    x = randint(mn_x - (ru[0] - ld[0] + 9) // 20,
+                                mn_x + (ru[0] - ld[0] + 9) // 20)
+                else:
+                    x = randint(mn_x, mx_x)
+                if mx_y - mn_y < 3:
+                    y = randint(mn_y - (ru[1] - ld[1] + 9) // 20,
+                                mn_y + (ru[1] - ld[1] + 9) // 20)
+                else:
+                    y = randint(mn_y, mx_y)
 
-                    if (p != res[k]) and (p != res[k - 1]) and \
-                       (not self.__is_intersecting_system(res[k], p,
-                        must_be_in)) and \
-                       (not self.__is_intersecting_system(p, res[k - 1],
-                        must_be_in)) and \
-                       (not self.__is_segment_strongly_intersecting_borders(
-                        res[k], p, res)) and \
-                       (not self.__is_segment_strongly_intersecting_borders(
-                        res[k - 1], p, res)) and \
-                       self.__is_in_borders(ld, ru, p) and \
-                       not self.__is_point_in_borders(p, res):
-                        res = res[:k] + [p] + res[k:]
-                    trial += 1
-                    if trial == 100:
-                        trial = 0
-                        k += 1
-                        print(k)
-                if stat_bar is not None:
-                    stat_bar.update(1 / NUM)
+                p = (x, y)
+
+                if (p != res[k]) and (p != res[k - 1]) and \
+                    (not self.__is_intersecting_system(res[k], p,
+                    must_be_in)) and \
+                    (not self.__is_intersecting_system(p, res[k - 1],
+                    must_be_in)) and \
+                    (not self.__is_segment_strongly_intersecting_borders(
+                    res[k], p, res)) and \
+                    (not self.__is_segment_strongly_intersecting_borders(
+                    res[k - 1], p, res)) and \
+                    self.__is_in_borders(ld, ru, p) and \
+                    not self.__is_point_in_borders(p, res):
+                    # #
+                    res = res[:k] + [p] + res[k:]
+                trial += 1
+                if trial == 100:
+                    trial = 0
+                    k += 1
+                    if k < len(res) and mem[(cur_t + 1) % len(mem)] == res[k]:
+                        cur_t += 1
+                        if stat_bar is not None:
+                            stat_bar.update(1 / len(mem))
+
             self.__points = res
             if stat_bar is not None:
                 stat_bar.finish()
