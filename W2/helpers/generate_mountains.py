@@ -57,7 +57,7 @@ def generate_mountains(size, amount, stat_bar=None):
     res = [[False for i in range(size)] for j in range(size)]
     first_amount = amount
     while amount > 0:
-        to_create = max(6 * int(random() * amount) // size, 1)
+        to_create = 6 * max(int(random() * amount) // size, 1)
         x = randint(size // 8, 7 * size // 8 - 1)
         y = randint(size // 8, 7 * size // 8 - 1)
         direction = [0, 0]

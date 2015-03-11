@@ -31,10 +31,11 @@ def generate_world(n):
     for i in range(n):
         for j in range(n):
             if str(res[i][j]) == str(square('^')):
-                mountains_array.append((i, j))
-                mountains_array.append((i + 1, j))
-                mountains_array.append((i, j + 1))
-                mountains_array.append((i + 1, j + 1))
+                mountains_array.append([])
+                mountains_array[-1].append((i, j))
+                mountains_array[-1].append((i + 1, j))
+                mountains_array[-1].append((i, j + 1))
+                mountains_array[-1].append((i + 1, j + 1))
     # Continent shape generation
     lu_pt = randint(n // 8, n // 4), randint(n // 8, n // 4)
     lu_tr = point_triangle(lu_pt)
@@ -48,7 +49,7 @@ def generate_world(n):
             randint(3 * n // 4, 7 * n // 8)
     rd_tr = point_triangle(rd_pt)
     continent = random_polygon(None, borders=((0, 0), (n - 1, n - 1)), 
-        must_be_in=[mountains_array, lu_tr, ru_tr, ld_tr, rd_tr],
+        must_be_in=mountains_array + [lu_tr, ru_tr, ld_tr, rd_tr],
         stat_bar=stat_bar)
     # World map generation
     for i in range(n):

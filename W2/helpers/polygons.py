@@ -8,7 +8,7 @@
 """
 
 from random import *
-import math
+from math import log
 
 """A place to import modules is up to that comment.
 
@@ -257,6 +257,7 @@ class random_polygon:
             assert borders is not None
             assert isinstance(must_be_in, list)
             ld, ru = borders
+            size = ru[0] - ld[0]
 
             res = convex(unite(must_be_in))
             NUM = 1
@@ -264,7 +265,7 @@ class random_polygon:
                 k = 0
                 trial = 0
                 while k < len(res):
-                    if sq_point_distance(res[k], res[k - 1]) <= 16:
+                    if sq_point_distance(res[k], res[k - 1]) <= log(size, 2) * (16 / log(100, 2)):
                         k += 1
                         trial = 0
                         print(k)
