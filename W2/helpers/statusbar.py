@@ -23,7 +23,7 @@ class statusbar:
         self.state = 0
         self.state_status = 0
         self.length = length
-        self.task_length = 25
+        self.task_length = task_length
         self.start_time = clock()
         self.cur_start_time = clock()
         self.clock_enabled = clock_enabled
