@@ -6,6 +6,7 @@ from square import square
 import sys
 import colored
 import os
+from time import clock
 import objects
 import mammoth
 from time import sleep
@@ -309,13 +310,15 @@ class terra:
         return '\n'
       
 print("\033[31mType Size of the World\033[0m\n")
+clock()
 world = terra(int(input()))
-print("New World is created\n")
+
+print("New World is created, time is %f\n"%(clock()))
 #==================
 #MAMMOTH GENERATION
 for new_mammoth in mammoth.generate_mammoth_herds(world):
     world.objects.append(new_mammoth)
-print("Mammoths generated\n")
+print("Mammoths generated, time is %f\n"%clock())
 #==================
 while True:
     s = input()
@@ -327,6 +330,7 @@ while True:
         print(world.objects[0].move(-1, 0))
         world.Print(world.objects[0]) 
         world.look()
+
     elif s == 'left':
         print(world.objects[0].move(0, -1))
         world.Print(world.objects[0]) 
@@ -348,14 +352,20 @@ while True:
     elif s == "print":
         world.Print(world.objects[0])
     elif s == 'it':
+        l = len(world.objects)
+        t = 0
         while True:
+        #len(world.objects) == l:
             for obj in world.objects[1:]:
-                obj.turn(world)
-            world.Print(world.objects[0])
-            sleep(1)
+                obj.turn()
+            #world.Print(world.objects[0])
+            t += 1
+            if len(world.objects) == 1:
+                print(t)
+                break
     elif s == "turn" or s == 't':
         for obj in world.objects[1:]:
-            obj.turn(world)
+            obj.turn()
         world.Print(world.objects[0])
         sys.stdout.flush()
         

@@ -38,7 +38,7 @@ class square:
         self.attributes = {}
         self.attributes["M-food"] = 10 - 5 * (self.t2 == "swamp") - \
                                     9 * (self.t == "mountain") + \
-                                    10 * (self.t2 == "grass" or self.t2 == "meadle")
+                                    10 * (self.t2 == "grass" or self.t2 == "meadle") - 5 * (self.t2 == '') + 10 * (self.t == "tree")
         self.attributes["water"] = 5
         if self.t.split()[0] == "water":
             self.attributes["M-food"] = 0

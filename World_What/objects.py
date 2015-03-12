@@ -13,7 +13,10 @@ class obj:
     def move(self, dx=0, dy=0, Possible={'ground', 'tree', 'sea water', 'water lake', 'water river', 'ice-berg', 'mountain'}):
         if isinstance(dx, tuple):
             dx, dy = dx
-        if (0 <= self.x + dx < self.world.size) and (0 <= self.y + dy < self.world.size) and (self.world.area[self.x + dx][self.y + dy].t in Possible) and self.world.area[self.x + dx][self.y + dy].obj == None:
+        if (0 <= self.x + dx < self.world.size) and \
+        (0 <= self.y + dy < self.world.size) and \
+        (self.world.area[self.x + dx][self.y + dy].t in Possible) and \
+        self.world.area[self.x + dx][self.y + dy].obj == None:
             self.world.area[self.x][self.y].obj = None
             self.x += dx
             self.y += dy

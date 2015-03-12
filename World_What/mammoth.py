@@ -4,7 +4,7 @@ import sys
 from collections import defaultdict
 Passable = {'ground', 'tree', 'mountain'}
 Herds = []
-all_directions = [(1,1),(0,1),(-1,1),(1,0),(-1,0),(1,-1),(0,-1),(-1, -1)]
+all_directions = [(0,1),(1,0),(-1,0),(0,-1)]
 
 class mammothHerd():
     
@@ -13,7 +13,7 @@ class mammothHerd():
 
 class mammoth(objects.obj):
     
-    def __init__(self, world, herdID, isLeader=False, age=0, hp=10, water=100, food=50):
+    def __init__(self, world, herdID, isLeader=False, age=0, hp=10, water=70, food=50):
         objects.obj.__init__(self, 'M', world)
         self.age, self.hp, self.water, self.food = age, hp, water, food
         self.last = [] 
@@ -44,20 +44,20 @@ class mammoth(objects.obj):
     def try_to_go(self, directions):
         for direction in directions:
             if self.move(direction, 0, Passable):
-                return
+                return True
         for direction in all_directions:
             if self.move(direction, 0, Passable):
-                return
+                return True
         print("OMG I AM STUCK")
-        return
+        return False
 
     def move_to(self, x, y):
         direction = []
-        if self.world.area[x][y].obj != None:
-            return False
+#        if self.world.area[x][y].obj != None:
+ #           return False
 
         if x >= self.x and y >= self.y:
-            direction.append((1, 1))
+            #direction.append((1, 1))
             if randint(0, 1) == 0:
                 direction.append((1, 0))
                 direction.append((0, 1))
@@ -65,7 +65,7 @@ class mammoth(objects.obj):
                 direction.append((0, 1))
                 direction.append((1, 0))
         if x <= self.x and y >= self.y:
-            direction.append((-1, 1))
+            #direction.append((-1, 1))
             if randint(0, 1) == 0:
                 direction.append((-1, 0))
                 direction.append((0, 1))
@@ -73,7 +73,7 @@ class mammoth(objects.obj):
                 direction.append((0, 1))
                 direction.append((-1, 0))
         if x >= self.x and y <= self.y:
-            direction.append((1, -1))
+            #direction.append((1, -1))
             if randint(0, 1) == 0:
                 direction.append((1, 0))
                 direction.append((0, -1))
@@ -81,7 +81,7 @@ class mammoth(objects.obj):
                 direction.append((0, -1))
                 direction.append((1, 0))
         if x <= self.x and y <= self.y:
-            direction.append((-1, -1))
+            #direction.append((-1, -1))
             if randint(0, 1) == 0:
                 direction.append((-1, 0))
                 direction.append((0, -1))
@@ -94,14 +94,23 @@ class mammoth(objects.obj):
         a = randint(min(5, self.world.area[self.x][self.y].attributes["M-food"]) \
         , min(10, self.world.area[self.x][self.y].attributes["M-food"]))
         self.world.area[self.x][self.y].attributes["M-food"] -= a
-        self.food += int(a * 1.5)
+        self.food += (a)
+        return a != 0
+    def eatNdrink(self):
+        a = min(self.world.area[self.x][self.y].attributes["M-food"],
+                self.world.area[self.x][self.y].attributes["water"])
+        self.world.area[self.x][self.y].attributes["M-food"] -= a
+        self.world.area[self.x][self.y].attributes["water"] -= a
+
+        self.food += int(a * 0.7)
+        self.water += int(a * 0.7)
         return a != 0
 
     def drink(self):
         a = randint(min(self.world.area[self.x][self.y].attributes["water"], \
         5), min(10, self.world.area[self.x][self.y].attributes["water"]))
-        self.world.area[self.x][self.y].attributes["water"] -= 1
-        self.water += int(a * 1.5)
+        self.world.area[self.x][self.y].attributes["water"] -= a
+        self.water += int(a)
         return a != 0
         
         
@@ -145,7 +154,7 @@ class mammoth(objects.obj):
         self.world.objects.pop(arr.index((self.x, self.y)))
     def isThirsty(self):
         return self.water < 30
-    def turn(self, world):
+    def turn(self):
         self.food -= randint(1, 2)
         self.water -= randint(1, 2)
         if self.hp <= 0:
@@ -156,6 +165,18 @@ class mammoth(objects.obj):
             self.hp -= randint(1, 2)
         if self.water <= 0:
             self.hp -= randint(1, 2)
+        if self.food <= 3 and self.water <= 3:
+            mx = 0
+            res = [0, 0]
+            for dx, dy in all_directions:
+                if self.world.area[self.x + dx][self.y + dy].attributes["M-food"] + \
+                self.world.area[self.x + dx][self.y + dy].attributes["water"] > mx + 5 and \
+                self.world.area[self.x + dx][self.y + dy].t in Passable:
+                    res = dx, dy
+                    mx = self.world.area[self.x + dx][self.y + dy].attributes["M-food"] + \
+                    self.world.area[self.x + dx][self.y + dy].attributes["water"] 
+            self.move(*res)
+            self.eatNdrink()
         while len(self.last) != 0 and self.last[-1][1] <= 0:
             self.last.pop()
         if len(self.last) != 0:
@@ -170,21 +191,13 @@ class mammoth(objects.obj):
                 if self.last[-1][1] == 0:
                     self.last.pop()
             return 
-
-        if self.isHungry():
-            mx_food = world.area[self.x][self.y].attributes["M-food"]
-            res = [0, 0]
-            res, dist = self.Search(min(5, (self.food - 10) / 2), "M-food")
-            self.move_to(res[0], res[1])
-            self.last.append(["eat()", 2])
-            self.last.append(["move_to(" + str(res[0]) + "," + str(res[1]) + ")", self.dist(*res)])
-            return
-        if self.isThirsty():
-            res, dist = self.Search(min(5, (self.water - 10) / 2), "water") 
-            self.move_to(res[0], res[1])
-#            mx_water = world.area[self.x][self.y].attributes["water"]
-            self.last.append(["drink()", 2])
-            self.last.append(["move_to(" + str(res[0]) + "," + str(res[1]) + ")", self.dist(*res)])
+        if self.isHungry() or self.isThirsty():
+            a = "M-food" if self.food < self.water else "water"
+            res, dist = self.Search(min(7, (min(self.food, self.water) + 10) // 2), a)
+            self.move_to(*res) 
+            self.last.append(["eat()" if a == "M-food" else "drink()", 2])
+ 
+            self.last.append([("move_to(%d, %d)"%res), self.dist(*res)])
             return
         if len(self.last) != 0:
             exec("self." + self.last[-1][0])
@@ -194,9 +207,25 @@ class mammoth(objects.obj):
             return 
         
         if self.isLeader:
-            self.wanderAround()
+            if random() < 1 / 3:
+                a = "M-food" if self.food < self.water \
+                             else "water"
+                res = self.Search(2, a)
+                self.last.append(["eat()" if a == "M-food" else "drink()", 2])
+                self.move_to(*res[0])
+                self.last.append([("move_to(%d, %d)"%res[0]), self.dist(*res[0])])
+            else:
+                self.wanderAround()
         else:
-            self.followLeader()
+            if self.dist(*self.getLeaderCoord()) < 3:
+                a = "M-food" if self.food < self.water \
+                             else "water"
+                res = self.Search(2, a)
+                self.move_to(*res[0])
+                self.last.append(["eat()" if a == "M-food" else "drink()", 2])
+                self.last.append([("move_to(%d, %d)"%res[0]), self.dist(*res[0])])
+            else:
+                self.followLeader()
 
 def generate_mammoth_herds(world):
     for herdID in range(2):
