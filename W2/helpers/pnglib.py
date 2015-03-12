@@ -71,6 +71,11 @@ def write_pixlist(pixlist, filename):
     f.close()
 
 
+def save_picture(world, filename):
+    pixlist = pixmap_to_pixlist(terra_to_pixmap(world))
+    write_pixlist(pixlist, filename)
+
+
 def watch_terra(world):
     pixlist = pixmap_to_pixlist(terra_to_pixmap(world))
     write_pixlist(pixlist, "/tmp/world.png")

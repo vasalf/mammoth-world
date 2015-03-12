@@ -40,7 +40,7 @@ def gen_precalc(n, continent, stat_bar):
     return precalc
 
 
-def generate_continent(n):
+def generate_continent(n, random_par):
     res = [[square('~') for i in range(n)] for j in range(n)]
     stat_bar = statusbar([
         ("Generating world shape", "Finished generating world shape"),
@@ -63,7 +63,8 @@ def generate_continent(n):
     rd_tr = point_triangle(rd_pt)
     continent = random_polygon(None, borders=((0, 0), (n - 1, n - 1)), 
         must_be_in=sample([lu_tr, ru_tr, ld_tr, rd_tr], 3),
-        stat_bar=stat_bar)
+        stat_bar=stat_bar,
+        random_par=random_par)
     # Preparing to make world map
     precalc = gen_precalc(n, continent, stat_bar)
     # World map generation
@@ -78,10 +79,10 @@ def generate_continent(n):
     return res
 
 
-def generate_world(n):
+def generate_world(n, random_par):
     res = [[square('~') for i in range(n)] for j in range(n)]
-    t1 = generate_continent(n)
-    t2 = generate_continent(n)
+    t1 = generate_continent(n, random_par)
+    t2 = generate_continent(n, random_par)
     for i in range(n):
         for j in range(n):
             if t1[i][j].t == "ground" or t2[i][j].t == "ground":
