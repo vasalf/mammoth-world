@@ -5,9 +5,11 @@ import relief
 from generate_mountains import generate_mountains
 from square import square
 from random import randint, sample
+from collections import deque
 from polygons import random_polygon, is_point_in_polygon
 from polygons import do_segments_intersect
 from statusbar import statusbar
+from pnglib import watch_terra
 
 
 def point_triangle(p):
@@ -40,16 +42,9 @@ def gen_precalc(n, continent, stat_bar):
     return precalc
 
 
-def generate_continent(n, random_par):
+def generate_continent(n, random_par, stat_bar):
     res = [[square('~') for i in range(n)] for j in range(n)]
-    stat_bar = statusbar([
-        ("Generating world shape", "Finished generating world shape"),
-        ("Preparing to make world map", "Prepared to make world map"),
-        ("Making world map", "Finished making world map")],
-        clock_enabled=True,
-        task_length = 30)
-    stat_bar.Print()
-    # Continent shape generation
+   # Continent shape generation
     lu_pt = randint(n // 8, n // 4), randint(n // 8, n // 4)
     lu_tr = point_triangle(lu_pt)
     ru_pt = randint(n // 8, n // 4), \
@@ -79,12 +74,71 @@ def generate_continent(n, random_par):
     return res
 
 
+def destroy_inland_seas(n, world, stat_bar):
+    def is_water(x, y):
+        if x < -1 or x > n or y < -1 or y > n:
+            return False
+        if x in [-1, n] or y in [-1, n]:
+            return True
+        return world[x][y].t == "water sea"
+
+    def bfs(x, y, c, arr):
+        q = deque([(x, y)])
+        while len(q):
+            x, y = q.popleft()
+            arr[x + 1][y + 1] = c
+            moves = [(0, 1), (0, -1), (-1, 0), (1, 0)]
+            for dx, dy in moves:
+                if is_water(x + dx, y + dy) and arr[x + dx + 1][y + dy + 1] == 0:
+                    q.append((x + dx, y + dy))
+                    arr[x + dx + 1][y + dy + 1] = c
+        stat_bar.update(1 / 2)
+        
+    arr = [[0 for i in range(n + 2)] for j in range(n + 2)]
+    bfs(-1, -1, 1, arr)
+
+    for x in range(n):
+        for y in range(n):
+            if not arr[x + 1][y + 1]:
+                world[x][y] = square('"')
+        stat_bar.update(1 / (2 * n))
+
+    stat_bar.finish()
+
+
+def some_magic(n, world, stat_bar):
+    par = 5
+    for i in range(n):
+        for j in range(n):
+            for x in range(i, min(i + par, n)):
+                if world[i][j].t == "ground" and world[x][j].t == "ground":
+                    for t in range(i, x):
+                        world[t][j] = square('"')
+            for y in range(j, min(j + par, n)):
+                if world[i][j].t == "ground" and world[i][y].t == "ground":
+                    for t in range(j, y):
+                        world[i][t] = square('"')
+        stat_bar.update(1 / n)
+    stat_bar.finish()
+
+
 def generate_world(n, random_par):
-    res = [[square('~') for i in range(n)] for j in range(n)]
-    t1 = generate_continent(n, random_par)
-    t2 = generate_continent(n, random_par)
+    res = [[square(chr(8776)) for i in range(n)] for j in range(n)]
+    stat_bar = statusbar([
+        ("Generating world shape", "Finished generating world shape"),
+        ("Preparing to make world map", "Prepared to make world map"),
+        ("Making world map", "Finished making world map")] * 2 + [
+        ("Doing some magic", "It was a kind of magic!"),
+        ("Destroying inland seas", "Destroyed inland seas")],
+        clock_enabled=True,
+        task_length = 30)
+    stat_bar.Print()
+    t1 = generate_continent(n, random_par, stat_bar)
+    t2 = generate_continent(n, random_par, stat_bar)
     for i in range(n):
         for j in range(n):
             if t1[i][j].t == "ground" or t2[i][j].t == "ground":
                 res[i][j] = square('"')
+    some_magic(n, res, stat_bar)
+    destroy_inland_seas(n, res, stat_bar)
     return relief.terra(res)
