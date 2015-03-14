@@ -88,7 +88,7 @@ class mammoth(objects.obj):
             else:
                 direction.append((0, -1))
                 direction.append((-1, 0))
-        self.try_to_go(direction)
+        return self.try_to_go(direction)
 
     def eat(self):
         a = randint(min(5, self.world.area[self.x][self.y].attributes["M-food"]) \
@@ -138,9 +138,9 @@ class mammoth(objects.obj):
             if used[u] > rad:
                 continue
             i, j = u
-            if self.world.area[i][j].attributes[obj] > mx and self.world.area[i][j].t in Passable:
+            if self.world.area[i][j].attributes[obj] - 1.5 * used[u] > mx and self.world.area[i][j].t in Passable:
                 res = (i, j)
-                mx = self.world.area[i][j].attributes[obj]
+                mx = self.world.area[i][j].attributes[obj] - 1.5 * used[u]
             for dx, dy in all_directions:
                 if 0 <= i + dx < self.world.size and 0 <= j + dy < self.world.size and \
                 used.get((i + dx, j + dy), -1) == -1:
@@ -149,16 +149,17 @@ class mammoth(objects.obj):
         return res, used[res]
 
     def remove(self):
-        self.world.area[self.x][self.y].obj = None
+        self.world.area[self.x][self.y].remove()
         arr = list(map(lambda x: (x.x, x.y), self.world.objects))
         self.world.objects.pop(arr.index((self.x, self.y)))
+#        self.world.area[self.x][self.y].obj = Non
     def isThirsty(self):
         return self.water < 30
     def turn(self):
         self.food -= randint(1, 2)
         self.water -= randint(1, 2)
         if self.hp <= 0:
-            self.world.log.append("mammoth has died\n")
+            self.world.log.append("mammoth has died in (%d, %d)\n"%(self.x, self.y))
             self.remove()
 
         if self.food <= 0:
@@ -181,15 +182,13 @@ class mammoth(objects.obj):
             self.last.pop()
         if len(self.last) != 0:
             
-            if not eval("self." + self.last[-1][0]):
+            while len(self.last) != 0 and not eval("self." + self.last[-1][0]):
                 self.last.pop()
-                if len(self.last) != 0:
-                    exec("self." + self.last[-1][0])
-                    self.last[-1][1] -= 1
             else:
-                self.last[-1][1] -= 1
-                if self.last[-1][1] == 0:
-                    self.last.pop()
+                if len(self.last) != 0:
+                    self.last[-1][1] -= 1
+                    if self.last[-1][1] == 0:
+                        self.last.pop()
             return 
         if self.isHungry() or self.isThirsty():
             a = "M-food" if self.food < self.water else "water"

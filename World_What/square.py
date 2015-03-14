@@ -50,6 +50,10 @@ class square:
     def __str__(self):
 #        if self.atr
         return str(self.c)
+
+    def remove(self):
+        self.obj = None
+
     def info(self):
         return (self.t + ', ' + (self.t2 + ', ') * bool(self.t2) + \
                ', '.join(map(str, self.attributes.items()))).rstrip(', ') + \

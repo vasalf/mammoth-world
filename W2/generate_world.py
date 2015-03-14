@@ -40,7 +40,7 @@ def gen_precalc(n, continent, stat_bar):
     return precalc
 
 
-def generate_continent(n, random_par):
+def generate_continent(n, random_par=16):
     res = [[square('~') for i in range(n)] for j in range(n)]
     stat_bar = statusbar([
         ("Generating world shape", "Finished generating world shape"),
@@ -79,7 +79,7 @@ def generate_continent(n, random_par):
     return res
 
 
-def generate_world(n, random_par):
+def generate_world(n, random_par=16):
     res = [[square('~') for i in range(n)] for j in range(n)]
     t1 = generate_continent(n, random_par)
     t2 = generate_continent(n, random_par)

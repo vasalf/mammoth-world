@@ -1,6 +1,6 @@
 colored = {}
 colored['X'] = ['X', '', 'red', 0, 'gray', 1, ["blinked"]]
-colored['M'] = ['M', '', 'red', 0, 'gray', 0, ["blinked"]]
+colored['M'] = ['M', '', 'red', 0, 'gray', 0, []]
 colored['@'] = ['@', '', "purpur", 0, 'black', 0, ["hard"]]
 class obj:
     def __init__(self, sym, world):
@@ -8,7 +8,8 @@ class obj:
         self.x = 0
         self.y = 0
         self.world = world
-
+#    def remove(self):
+#        self.obj = None
 #All types should be possible on default
     def move(self, dx=0, dy=0, Possible={'ground', 'tree', 'sea water', 'water lake', 'water river', 'ice-berg', 'mountain'}):
         if isinstance(dx, tuple):
@@ -25,8 +26,11 @@ class obj:
             return True
         return False
     def go_to(self, x, y):
+        self.world.area[self.x][self.y].remove()
         self.x = x
         self.y = y
+        self.world.area[self.x][self.y].obj = self
+
     def __str__(self):
         return self.c
     #def turn(self, world):
