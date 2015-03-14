@@ -6,4 +6,8 @@ from generate_world import generate_world
 
 
 print("Type Size of the World")
+<<<<<<< HEAD
 pnglib.watch_terra(generate_world(int(input()), int(input())))
+=======
+pnglib.watch_terra(generate_world(int(input()), 144))
+>>>>>>> refs/remotes/origin/master

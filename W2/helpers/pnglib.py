@@ -79,5 +79,5 @@ def save_picture(world, filename):
 def watch_terra(world):
     pixlist = pixmap_to_pixlist(terra_to_pixmap(world))
     write_pixlist(pixlist, "/tmp/world.png")
-    os.system(png_viewer + " /tmp/world.png")
+    os.system(png_viewer + " /tmp/world.png &")
 

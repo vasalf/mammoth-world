@@ -24,7 +24,7 @@ class square:
         if typ == 'T':
             self.t = 'tree'
         elif typ == chr(8776):
-            self.t = "sea water"
+            self.t = "water sea"
         elif typ == 'S':
             self.t = "water lake"
         elif typ == '~':
