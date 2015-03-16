@@ -6,4 +6,4 @@ from generate_world import generate_world
 
 
 print("Type Size of the World")
-pnglib.watch_terra(generate_world(int(input()), 144))
+pnglib.watch_terra(generate_world(int(input())))

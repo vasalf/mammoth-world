@@ -122,7 +122,8 @@ def some_magic(n, world, stat_bar):
     stat_bar.finish()
 
 
-def generate_world(n, random_par):
+def generate_world(n):
+    random_par = 0.16 * n
     res = [[square(chr(8776)) for i in range(n)] for j in range(n)]
     stat_bar = statusbar([
         ("Generating world shape", "Finished generating world shape"),
