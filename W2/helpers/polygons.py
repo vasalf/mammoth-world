@@ -18,6 +18,44 @@ from geom import *
 __author__ = "vasalf"
 
 
+"""It is a helper segment tree. Please, don't use it directly!
+
+"""
+
+
+class segment_tree:
+    #n is size
+    def __init__(self, n):
+        self.t = [0] * (4 * n)
+
+    def __get_sum(self, v, L, R, l, r):
+        if r <= L or R <= l:
+            return 0
+        elif l <= L and R <= r:
+            return self.t[v]
+        else:
+            mid = (L + R) // 2
+            return self.__get_sum(2 * v + 1, L, mid, l, r) + \
+                self.__get_sum(2 * v + 2, mid, R, l, r)
+
+    def __update(self, v, L, R, x, y):
+        if x < L or x >= R:
+            return
+        elif L == R - 1:
+            self.t[v] = y
+        else:
+            mid = (L + R) // 2
+            self.__update(2 * v + 1, L, mid, x, y)
+            self.__update(2 * v + 2, mid, R, x, y)
+            self.t[v] = self.t[2 * v + 1] + self.t[2 * v + 2]
+
+    def get_sum(self, l, r):
+        return self.__get_sum(0, 0, n, l, r)
+
+    def update(self, x, y):
+        self.__update(0, 0, n, x, y)
+
+
 class random_polygon:
     """Constructor args:
        self: no comments
