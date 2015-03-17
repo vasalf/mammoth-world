@@ -45,6 +45,9 @@ class perceptron:
                 print(str(self.__sr_edges[(s, r)]).ljust(5), end=" ")
             print()
 
+    def get_dict(self):
+        return self.__sr_edges
+
 
 from random import randint
 
@@ -69,5 +72,5 @@ def test(k):
 
     print("perceptron has %d mistakes in %d questions (%.02f)" % (cnt, NUM, cnt / NUM))
 
-test(int(input()))
+#test(int(input()))
  
