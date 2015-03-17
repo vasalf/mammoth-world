@@ -81,6 +81,21 @@ class random_polygon:
         return is_point_in_polygon(p, res) and \
             not self.__is_point_in_borders(p, res)
 
+    def __bsearch_segment_strong_intersection(self, a, b, y):
+        l, r = self.ld[0], self.ru[0] + 1
+        while l < r + 1:
+            mid = (l + r) // 2
+            if do_segments_strongly_intersect(self, a, b, (mid, y), (self.ru[0] + 1, y)):
+                l = mid
+            else:
+                r = mid
+        return l
+
+    def __is_segment_strongly_intersecting_borders(self, a, b):
+        for y in range(min(a[1], b[1]), max(a[1], b[1])):
+            
+
+
     def __is_segment_strongly_intersecting_borders(self, a, b, res=None):
         if res is None:
             res = self
@@ -105,7 +120,7 @@ class random_polygon:
                 return True
         return False
 
-    def __is_intersecting(self, p, a, b, i=None):
+    def __is_intersecting(self, p, a, b):
         if self.__is_segment_strongly_intersecting_borders(a, b, p):
             return True
         if self.__is_point_in_borders(a, p) and \
@@ -120,11 +135,9 @@ class random_polygon:
     def __is_intersecting_system(self, a, b, system, res=None):
         if res is None:
             res = self
-        i = 0
         for p in system:
-            if self.__is_intersecting(p, a, b, i):
+            if self.__is_intersecting(p, a, b):
                 return True
-            i += 1
         return False
 
     def __is_in_borders(self, ld, ru, p):
