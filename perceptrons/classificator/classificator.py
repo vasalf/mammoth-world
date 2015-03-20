@@ -1,78 +1,90 @@
-#!/usr/bin/pypy3
+#!/usr/bin/python3
 
-from perceptron import perceptron
-
-
-class classificator:
-    def __init__(self, s):
-        self.__s = s
+class perceptron:
+    def __init__(self, n):
+        self.__n = n
+        self.__edges = dict()
         
-        self.__lambda = perceptron(s, 1)
-        self.__v = perceptron(s, 1)
+        # 1-weight edges
+        for i in range(n):
+            self.__edges[(2 * i, 2 * n + i)] = 1
 
-    def __get_v(self):
-        k = self.__v.get_dict()
-        res = [k[(i, 0)] for i in range(self.__s)]
-        return res
+        # v-weight edges
+        for i in range(n):
+            self.__edges[(2 * i + 1, 2 * n + i)] = 1
 
-    def __get_lambda(self):
-        k = self.__lambda.get_dict()
-        res = [k[(i, 0)] for i in range(self.__s)]
-        return res
+        # lambda-weight edges
+        for i in range(n):
+            self.__edges[(2 * n + i, 3 * n)] = 1
 
-    def get_val(self, p):
-        v = self.__get_v()
-        np = [p[i] - v[i] for i in range(self.__s)]
-        return self.__lambda.get_val(np)[0]
+    def get_val(self, arr):
+        n = self.__n
+        a_neurons_vals = [0 for i in range(self.__n)]
+        for i in range(self.__n):
+            a_neurons_vals[i] += arr[i] * self.__edges[(2 * i, 2 * n + i)]
+            a_neurons_vals[i] += (-1) * self.__edges[(2 * i + 1, 2 * n + i)]
+        res = 0
+        for i in range(self.__n):
+            res += a_neurons_vals[i] * self.__edges[(2 * n + i, 3 * n)]
+        return 1 if res > 0 else -1
 
-    def insert_ans(self, p, ans):
-        v = self.__get_v()
-        np = [p[i] - v[i] for i in range(self.__s)]
-        self.__lambda.insert_ans(np, [ans])
-        Lambda = self.__get_lambda()
-        self.__v.insert_ans(Lambda, [-ans])
+    def insert_val(self, arr, ans):
+        n = self.__n
+        zeta = self.get_val(arr)
+        if zeta == ans:
+            return
+        else:
+            for i in range(n):
+                x = ans * arr[i]
+                self.__edges[(2 * n + i, 3 * n)] += x
+                lambdas = self.__edges[(2 * n + i, 3 * n)]
+                v = self.__edges[(2 * i + 1, 2 * n + i)]
+                if zeta > 0:
+                    v = v + (v * x + v * v) / lambdas
+                else:
+                    v = v + (v * x - v * v) / lambdas
+                self.__edges[(2 * i + 1, 2 * n + i)] = v
+
+    def print_plane(self):
+        n = self.__n
+        coef = [0 for i in range(4)]
+        for i in range(3):
+            coef[i] += self.__edges[(2 * n + i, 3 * n)]
+            coef[-1] += self.__edges[(2 * n + i, 3 * n)] * self.__edges[(2 * i + 1, 2 * n + i)]
+        print(coef)
+        for i in range(3):
+            print("lambda", i, self.__edges[(2 * n + i, 3 * n)])
+            print("v", i, self.__edges[(2 * i + 1, 2 * n + i)])
 
 
 from random import randint
 
+
 def test(k):
-    hyperplane = [randint(-100, 100) for i in range(k + 1)]
+    hyperplane = [randint(-10, 10) for i in range(k + 1)]
     print(hyperplane)
-    NUM = 100000
-    p = classificator(k)
+    NUM = 10 ** 5
+    p = perceptron(k)
     for i in range(100 * NUM):
-        pt = [randint(-100, 100) for i in range(k)]
-        val = hyperplane[k]
+        val = [randint(-100, 100) for i in range(k)]
+        res = hyperplane[-1]
         for i in range(k):
-            val += hyperplane[i] * pt[i]
-        if val > 0:
-            ans = 1
-        else:
-            ans = -1
-        p.insert_ans(pt, ans)
-    print("Classificator educated")
-    mistakes = 0
-    y = 0
-    no = 0
+            res += val[i] * hyperplane[i]
+        res = 1 if res > 0 else -1
+        p.insert_val(val, res)
+    num = 0
+    print("Finished education")
     for i in range(NUM):
-        pt = [randint(-100, 100) for i in range(k)]
-        val = hyperplane[k]
+        val = [randint(-100, 100) for i in range(k)]
+        res = hyperplane[-1]
         for i in range(k):
-            val += hyperplane[i] * pt[i]
-        if val > 0:
-            ans = 1
-        else:
-            ans = -1
-        n = p.get_val(pt)
-        if ans != n:
-            mistakes += 1
-        if n == 1:
-            y += 1
-        else:
-            no += 1
-    print("classificator has %d mistakes in %d questions (%.02f)" % (mistakes, NUM, mistakes / NUM))
-    print("classificator gave %d positive answers and %d negative answers" % (y, no))
+            res += val[i] * hyperplane[i]
+        res = 1 if res > 0 else -1
+        zeta = p.get_val(val)
+        if zeta != res:
+            num += 1
+    p.print_plane()
+    print("perceptron has %d mistakes in %d questions (%.02f)" % (num, NUM, num / NUM))
 
 
 test(int(input()))
-
