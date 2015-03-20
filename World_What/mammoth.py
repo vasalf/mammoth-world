@@ -34,10 +34,12 @@ class mammoth(objects.obj):
     def getLeader(self):
         ans = Herds[self.herdID].mammoths[0]
         return ans
+    
     def info(self):
         print("in point", self.x, self.y)
         print("f = ", self.food, "w = " + str(self.water))
         print(' '.join(map(str, self.last)))
+
     def dist(self, x, y):
         return abs(x - self.x) + abs(y - self.y) - min(abs(x - self.x), abs(y - self.y)) // 2
 
@@ -163,10 +165,11 @@ class mammoth(objects.obj):
             self.remove()
 
         if self.food <= 0:
-            self.hp -= randint(1, 2)
+            self.hp -= 1
         if self.water <= 0:
-            self.hp -= randint(1, 2)
-        if self.food <= 3 and self.water <= 3:
+            self.hp -= 1
+
+        if self.food <= 6 and self.water <= 6:
             mx = 0
             res = [0, 0]
             for dx, dy in all_directions:

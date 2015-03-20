@@ -42,26 +42,25 @@ def gen_precalc(n, continent, stat_bar):
     return precalc
 
 
-<<<<<<< HEAD
-def generate_continent(n, random_par=16):
-=======
 def generate_continent(n, random_par, stat_bar):
->>>>>>> refs/remotes/origin/master
     res = [[square('~') for i in range(n)] for j in range(n)]
    # Continent shape generation
-    lu_pt = randint(n // 8, n // 4), randint(n // 8, n // 4)
-    lu_tr = point_triangle(lu_pt)
-    ru_pt = randint(n // 8, n // 4), \
-            randint(3 * n // 4, 7 * n // 8)
-    ru_tr = point_triangle(ru_pt)
-    ld_pt = randint(3 * n // 4, 7 * n // 8), \
+    points = []
+    for i in range(3):
+        lu_pt = randint(n // 8, n // 3), randint(n // 8, n // 3)
+        lu_tr = point_triangle(lu_pt)
+        ru_pt = randint(n // 8, n // 4), \
+            randint(2 * n // 3, 7 * n // 8)
+        ru_tr = point_triangle(ru_pt)
+        ld_pt = randint(2 * n // 3, 7 * n // 8), \
             randint(n // 8, n // 4)
-    ld_tr = point_triangle(ld_pt)
-    rd_pt = randint(3 * n // 4, 7 * n // 8), \
-            randint(3 * n // 4, 7 * n // 8)
-    rd_tr = point_triangle(rd_pt)
+        ld_tr = point_triangle(ld_pt)
+        rd_pt = randint(2 * n // 3, 7 * n // 8), \
+            randint(2 * n // 3, 7 * n // 8)
+        rd_tr = point_triangle(rd_pt)
+        points.extend([lu_tr, ru_tr, ld_tr, rd_tr])
     continent = random_polygon(None, borders=((0, 0), (n - 1, n - 1)), 
-        must_be_in=sample([lu_tr, ru_tr, ld_tr, rd_tr], 3),
+        must_be_in=sample(points, 5),
         stat_bar=stat_bar,
         random_par=random_par)
     # Preparing to make world map
@@ -78,12 +77,6 @@ def generate_continent(n, random_par, stat_bar):
     return res
 
 
-<<<<<<< HEAD
-def generate_world(n, random_par=16):
-    res = [[square('~') for i in range(n)] for j in range(n)]
-    t1 = generate_continent(n, random_par)
-    t2 = generate_continent(n, random_par)
-=======
 def destroy_inland_seas(n, world, stat_bar):
     def is_water(x, y):
         if x < -1 or x > n or y < -1 or y > n:
@@ -135,21 +128,23 @@ def some_magic(n, world, stat_bar):
 def generate_world(n):
     random_par = 0.16 * n
     res = [[square(chr(8776)) for i in range(n)] for j in range(n)]
+    _n = randint(2, 5)
     stat_bar = statusbar([
         ("Generating world shape", "Finished generating world shape"),
         ("Preparing to make world map", "Prepared to make world map"),
-        ("Making world map", "Finished making world map")] * 2 + [
+        ("Making world map", "Finished making world map")] * _n + [
         ("Doing some magic", "It was a kind of magic!"),
         ("Destroying inland seas", "Destroyed inland seas")],
         clock_enabled=True,
         task_length = 30)
     stat_bar.Print()
-    t1 = generate_continent(n, random_par, stat_bar)
-    t2 = generate_continent(n, random_par, stat_bar)
->>>>>>> refs/remotes/origin/master
+    t_s = [generate_continent(n, random_par, stat_bar) for i in range(_n)]
     for i in range(n):
         for j in range(n):
-            if t1[i][j].t == "ground" or t2[i][j].t == "ground":
+            curr_point = False
+            for k in range(len(t_s)):
+                curr_point |=  (t_s[k][i][j].t == "ground")
+            if curr_point:
                 res[i][j] = square('"')
     some_magic(n, res, stat_bar)
     destroy_inland_seas(n, res, stat_bar)

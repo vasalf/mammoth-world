@@ -1,0 +1,16 @@
+
+
+WARNING:
+
+    If you want to use that file, you should install PyPNG library
+    of version 0.0.17 or more. In Arch Linux it is available in
+    AUR (https://aur.archlinux.org/packages/python-pypng-git/), on
+    other platforms if it is not available in standart repos, you
+    can find it on https://github.com/drj11/pypng.
+
+    Also this file uses sxiv image viewer (in Arch Linux it is
+    available in standart repository) but if you want to use other
+    image viewer, simply change a global constant "png_viewer" in
+    the code.
+
+
