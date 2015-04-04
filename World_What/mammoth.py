@@ -1,5 +1,6 @@
 from random import *
 import objects
+from square import max_size, number
 import sys
 from collections import defaultdict
 Passable = {'ground', 'tree', 'mountain'}
@@ -34,8 +35,12 @@ class mammoth(objects.obj):
     def getLeader(self):
         ans = Herds[self.herdID].mammoths[0]
         return ans
-    
-    def info(self):
+    def get_amount(self, i, j, obj):
+        x = self.area.world[i][j].last
+        return -self.dist(i, j) * 1.5 + self.area.world[i][j].attributes[obj] +\
+        max(0, max_size[number[self.area.world[i][j].t]][obj] // (x - 2.1))
+
+    def  info(self):
         print("in point", self.x, self.y)
         print("f = ", self.food, "w = " + str(self.water))
         print(' '.join(map(str, self.last)))
@@ -95,7 +100,8 @@ class mammoth(objects.obj):
     def eat(self):
         a = randint(min(5, self.world.area[self.x][self.y].attributes["M-food"]) \
         , min(10, self.world.area[self.x][self.y].attributes["M-food"]))
-        self.world.area[self.x][self.y].attributes["M-food"] -= a
+        self.world.area[self.x][self.y].attributes["M-food"]-= a 
+
         self.food += (a)
         return a != 0
     def eatNdrink(self):
@@ -140,10 +146,10 @@ class mammoth(objects.obj):
             if used[u] > rad:
                 continue
             i, j = u
-            if self.world.area[i][j].attributes[obj] - 1.5 * used[u] > mx and self.world.area[i][j].t in Passable:
+            if self.get_amount(i, j, obj) > mx and self.world.area[i][j].t in Passable:
                 res = (i, j)
                 mx = self.world.area[i][j].attributes[obj] - 1.5 * used[u]
-            for dx, dy in all_directions:
+             for dx, dy in all_directions:
                 if 0 <= i + dx < self.world.size and 0 <= j + dy < self.world.size and \
                 used.get((i + dx, j + dy), -1) == -1:
                    used[(i + dx, j + dy)] = used[(i, j)] + 1

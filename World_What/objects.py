@@ -23,6 +23,7 @@ class obj:
             self.y += dy
 #            print(Possible, self.world.area[self.x][self.y].t, self.world.area[self.x][self.y].t in Possible, sep = '\n')
             self.world.area[self.x][self.y].obj = self
+            self.world.area[self.x][self.y].last_time = 0
             return True
         return False
     def go_to(self, x, y):

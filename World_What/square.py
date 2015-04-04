@@ -7,6 +7,30 @@ mountain = '^'
 river = '~'
 sea = '~'
 tree = 'T'
+number = {}
+
+number["swamp"] = 0
+number["ground"] = 1
+number["meadle"] = 2
+number["mountain"] = 3
+number["grass"] = 4
+number["water river"] = 5
+number["water lake"] = 6
+max_size = [{} for i in range(10)]
+max_size[0]["M-food"] = 5
+max_size[0]["water"] = 5
+max_size[1]["M-food"] = 10
+max_size[1]["water"] = 5
+max_size[2]["M-food"] = 20
+max_size[2]["water"] = 5
+max_size[3]["M-food"] = 0
+max_size[3]["water"] = 5
+max_size[4]["M-food"] = 18
+max_size[4]["water"] = 5
+max_size[5]["M-food"] = 0
+max_size[5]["water"] = 40
+max_size[6]["M-food"] = 0
+max_size[6]["water"] = 40
 
 class square:
     def __init__(self, typ):
@@ -36,13 +60,15 @@ class square:
             self.t = "mountain"
 
         self.attributes = {}
-        self.attributes["M-food"] = 10 - 5 * (self.t2 == "swamp") - \
+        self.attributes["M-food"] = (10 - 5 * (self.t2 == "swamp") - \
                                     9 * (self.t == "mountain") + \
-                                    10 * (self.t2 == "grass" or self.t2 == "meadle") - 5 * (self.t2 == '') + 10 * (self.t == "tree")
+                                    10 * (self.t2 == "grass" or self.t2 == "meadle") -\
+                                    5 * (self.t2 == '') + 10 * (self.t == "tree"))
         self.attributes["water"] = 5
         if self.t.split()[0] == "water":
             self.attributes["M-food"] = 0
             self.attributes["water"] = 40
+        self.last = 0
 
 
         self.obj = None

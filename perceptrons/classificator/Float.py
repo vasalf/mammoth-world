@@ -92,3 +92,8 @@ class Float:
     def __str__(self):
         return "%d.%d"%(self.up >> self.down, self.up ^ ((self.up >>self.down) << self.down))
 
+i = Float()
+i += 1
+i *= 1000
+print(i)
+print(i / i)
