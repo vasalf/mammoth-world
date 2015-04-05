@@ -1,12 +1,11 @@
 from random import *
 import objects
-from square import max_size, number
 import sys
 from collections import defaultdict
-Passable = {'ground', 'tree', 'mountain'}
+Passable = {'meadle', 'coast', 'grass', 'swamp', 'ground', 'tree', ""}
 Herds = []
 all_directions = [(0,1),(1,0),(-1,0),(0,-1)]
-
+max_hp = 10
 class mammothHerd():
     
     def __init__(self):
@@ -16,12 +15,16 @@ class mammoth(objects.obj):
     
     def __init__(self, world, herdID, isLeader=False, age=0, hp=10, water=70, food=50):
         objects.obj.__init__(self, 'M', world)
+        self.name = "mammoth"
         self.age, self.hp, self.water, self.food = age, hp, water, food
         self.last = [] 
+        self.herd = []
         self.herdID = herdID
         self.isLeader = isLeader
+        self.moving_somewhere = True
         if self.isLeader:
             self.moving_somewhere = False
+
         self.world.area[self.x][self.y].obj = self
 
     def wanderAround(self):
@@ -35,18 +38,11 @@ class mammoth(objects.obj):
     def getLeader(self):
         ans = Herds[self.herdID].mammoths[0]
         return ans
-    def get_amount(self, i, j, obj):
-        x = self.area.world[i][j].last
-        return -self.dist(i, j) * 1.5 + self.area.world[i][j].attributes[obj] +\
-        max(0, max_size[number[self.area.world[i][j].t]][obj] // (x - 2.1))
-
     def  info(self):
         print("in point", self.x, self.y)
         print("f = ", self.food, "w = " + str(self.water))
         print(' '.join(map(str, self.last)))
 
-    def dist(self, x, y):
-        return abs(x - self.x) + abs(y - self.y) - min(abs(x - self.x), abs(y - self.y)) // 2
 
     def try_to_go(self, directions):
         for direction in directions:
@@ -98,26 +94,27 @@ class mammoth(objects.obj):
         return self.try_to_go(direction)
 
     def eat(self):
-        a = randint(min(5, self.world.area[self.x][self.y].attributes["M-food"]) \
-        , min(10, self.world.area[self.x][self.y].attributes["M-food"]))
-        self.world.area[self.x][self.y].attributes["M-food"]-= a 
+        const = self.get_amount(self.x, self.y, "M-food")
+        a = randint(min(5, const), min(10, const))
+        self.world.area[self.x][self.y].attributes["M-food"] = const - a 
 
         self.food += (a)
         return a != 0
     def eatNdrink(self):
-        a = min(self.world.area[self.x][self.y].attributes["M-food"],
-                self.world.area[self.x][self.y].attributes["water"])
-        self.world.area[self.x][self.y].attributes["M-food"] -= a
-        self.world.area[self.x][self.y].attributes["water"] -= a
+        const1 = self.get_amount(self.x, self.y, "M-food")
+        const2 = self.get_amount(self.x, self.y, "water")
+        a = min(const1, const2)
+        self.world.area[self.x][self.y].attributes["M-food"] = const1 - a
+        self.world.area[self.x][self.y].attributes["water"] -= const2 - a
 
         self.food += int(a * 0.7)
         self.water += int(a * 0.7)
         return a != 0
 
     def drink(self):
-        a = randint(min(self.world.area[self.x][self.y].attributes["water"], \
-        5), min(10, self.world.area[self.x][self.y].attributes["water"]))
-        self.world.area[self.x][self.y].attributes["water"] -= a
+        const = self.get_amount(self.x, self.y, "water")
+        a = randint(min(5, const), min(10, const))
+        self.world.area[self.x][self.y].attributes["water"] = const - a 
         self.water += int(a)
         return a != 0
         
@@ -135,6 +132,7 @@ class mammoth(objects.obj):
 
     def isHungry(self):
         return self.food < 30
+
     def Search(self, rad, obj):
         x, y = self.x, self.y
         used = dict()
@@ -149,12 +147,34 @@ class mammoth(objects.obj):
             if self.get_amount(i, j, obj) > mx and self.world.area[i][j].t in Passable:
                 res = (i, j)
                 mx = self.world.area[i][j].attributes[obj] - 1.5 * used[u]
-             for dx, dy in all_directions:
+            for dx, dy in all_directions:
                 if 0 <= i + dx < self.world.size and 0 <= j + dy < self.world.size and \
                 used.get((i + dx, j + dy), -1) == -1:
                    used[(i + dx, j + dy)] = used[(i, j)] + 1
                    q.append((i + dx, j + dy))
         return res, used[res]
+
+    def run_away(self, coords):
+        x, y = coords
+        self.move_to(self.x-x, self.y-y)
+
+    def objects_search(self, rad, obj):
+        x, y = self.x, self.y
+        used = dict()
+        used[(x, y)] = 0
+        q = [(x, y)]
+        for u in q:
+            if used[u] > rad:
+                return (False, (0, 0))
+            i, j = u
+            if self.world.area[i][j].obj != None and self.world.area[i][j].obj.name != obj\
+            self.world.area[i][j].obj.name != "SideOfGod":
+                return (True, (i, j))
+            for dx, dy in all_directions:
+                if 0 <= i  + dx < self.world.size and 0 <= j + dy < self.world.size and \
+                used.get((i + dx, j + dy), -1) == -1:
+                    used[(i + dx, j + dy)] = used[(i, j)] + 1
+                    q.append((i + dx, j + dy))
 
     def remove(self):
         self.world.area[self.x][self.y].remove()
@@ -167,14 +187,16 @@ class mammoth(objects.obj):
         self.food -= randint(1, 2)
         self.water -= randint(1, 2)
         if self.hp <= 0:
-            self.world.log.append("mammoth has died in (%d, %d)\n"%(self.x, self.y))
+            self.world.log.append("mammoth has died in (%d, %d) at %d turn\n"%(self.x, self.y, self.world.turn))
             self.remove()
 
         if self.food <= 0:
             self.hp -= 1
         if self.water <= 0:
             self.hp -= 1
-
+        if self.food >= 25 and self.water >= 25:
+            self.hp += 1
+            self.hp = min(self.hp, max_hp)
         if self.food <= 6 and self.water <= 6:
             mx = 0
             res = [0, 0]
@@ -185,8 +207,23 @@ class mammoth(objects.obj):
                     res = dx, dy
                     mx = self.world.area[self.x + dx][self.y + dy].attributes["M-food"] + \
                     self.world.area[self.x + dx][self.y + dy].attributes["water"] 
-            self.move(*res)
+            self.move(res[0], res[1], Passable)
             self.eatNdrink()
+        
+       
+        if self.isLeader:
+            res, coords = self.objects_search(6, "mammoth")
+            if res:
+                self.last.append(("run_away((%d, %d))"%coords, 2))
+                for i in range(1, len(self.herd)):
+                    self.herd[i].last.append(("followLeader()", 2))
+            else:
+                coords, res = self.Search(6, "M-food")
+                x, y = coords
+                if res > 3: 
+                    self.move_to(*coords)
+                    for i in range(1, len(self.herd)):
+                        self.herd[i].last.append(("followLeader()", 2))
         while len(self.last) != 0 and self.last[-1][1] <= 0:
             self.last.pop()
         if len(self.last) != 0:
@@ -199,6 +236,8 @@ class mammoth(objects.obj):
                     if self.last[-1][1] == 0:
                         self.last.pop()
             return 
+                    
+
         if self.isHungry() or self.isThirsty():
             a = "M-food" if self.food < self.water else "water"
             res, dist = self.Search(min(7, (min(self.food, self.water) + 10) // 2), a)
@@ -215,6 +254,7 @@ class mammoth(objects.obj):
             return 
         
         if self.isLeader:
+
             if random() < 1 / 3:
                 a = "M-food" if self.food < self.water \
                              else "water"
@@ -265,15 +305,17 @@ def generate_mammoth_herd(world, amount, herdID):
         canCreate = False
         while not canCreate:
             dx, dy = choice(around)
-            if world.area[x + dx][y + dy].t in Passable:
+            if world.area[x + dx][y + dy].t2 in Passable:
                 canCreate = True
                 x_new, y_new = x + dx, y + dy
         x, y = x_new, y_new
+    for mammoth in herd.mammoths[1:]:
+        herd.mammoths[0].herd.append(mammoth)
     Herds.append(herd)
     #return herd
 
 def create_mammoth(world, x, y, herdID, oldest):
-    if (world.area[x][y].obj != None):
+    if (world.area[x][y].obj != None or (world.area[x][y].t2 not in Passable)):
         return 0, False
         
     new = mammoth(world, herdID, True if oldest else False, randint(75, 95) if oldest else randint(0, 74))

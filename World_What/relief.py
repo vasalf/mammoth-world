@@ -29,13 +29,14 @@ RiverSize = [34, 49, 27, 40, 14, 121, 75, 97]
 ##amount##
 
 # amount #
+coast = "'"
 grass = '`'
 swamp = ';'
 meadle = ':'
 simple = '"'
 mountain = '^'
 river = '~'
-sea = '~'
+sea = '$'
 tree = 'T'
 moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, -1), (-1, 1), (-1, -1), (1, 1)]
 types = ['`', '"',  "T", '~', 'S', "^", ':', ';']
@@ -60,7 +61,7 @@ chance = [0.3, 0.5, 0.8, 0.9, 1, 1.1, 1.2, 2.5, 1.5, 2, 1.75, 3.3]
 # colors #
 color = {}
 color["T"] = ["T",'', "black", 0, "green", 0, []]
-color['"'] = ['"', '', "gray", 1, "yellow", 1, []]
+color['"'] = ['"', '', "gray", 1, "yellow", 0, ["light"]]
 color["S"] = ["S", '', "dark_blue", 1, "dark_blue", 0, []]
 color["~"] = ["~", '', "dark_blue", 1, "light_blue", 0, []]
 color[sea] = [sea, '', 'dark_blue', 1, "dark_blue", 0, []]
@@ -68,9 +69,10 @@ color[swamp] = [swamp, '', "purpur", 0, "green", 1, []]
 color[meadle] = [meadle, '', "green", 0, "green", 1, ["light"]]
 color[grass] = [grass, '', "yellow", 0, "green", 1, ["hard"]]
 color['^'] = [mountain, '', 'black', 0, 'gray', 0, ["light"]]
+color[coast] = [coast, '', "yellow", 0, "green", 0, ["hard"]]
 ##
-
-
+ground = ["meadle", 'grass', 'swamp', 'coast']
+water = ["water river", "water lake", "sea water"]
 
 def generate_sea_first(arr, i, j):
     SIZE = len(arr)
@@ -109,12 +111,12 @@ def generate(arr, i, j, t, flag=0):
     if not(0 <= i < SIZE and 0 <= j < SIZE):
         return 0
 
-    if t.t == 'tree' or t.t == 'ground':
+    if t.t2 == 'tree' or t.t2 in ground:
         height = randint(*height_constants[t.c][:2])
         height_delta = height_constants[t.c][2]
         q = [(i, j)]
         index = 0
-        if t.t == 'tree':
+        if t.t2 == 'tree':
             if flag == 0:
                 size = choice(WOOD_SIZE)
             else:
@@ -135,7 +137,7 @@ def generate(arr, i, j, t, flag=0):
                 if index % 7 == 0:
                     shuffle(q)
             index += 1
-    elif t.t == 'water lake':
+    elif t.t2 == 'water lake':
 
         q = [(i, j)]
         index = 0
@@ -149,16 +151,16 @@ def generate(arr, i, j, t, flag=0):
             arr[i][j] = t
             for dx, dy in moves:
                 if 0 <= i + dx < SIZE and 0 <= j + dy < SIZE:
-                    if random() < 0.76 and arr[i + dx][j + dy].t == "ground":
+                    if random() < 0.76 and arr[i + dx][j + dy].t2 in ground:
                         q.append((i + dx, j + dy))
             if index % 7 == 0:
                 shuffle(q)
             index += 1
-    elif t.t == 'water river' or t.t == 'mountain':
+    elif t.t2 == 'water river' or t.t2 == 'mountain':
         index = 0
         q = [(i, j)]
         height = randint(2000, 4000)
-        if t.t == 'water river':
+        if t.t2 == 'water river':
             
             if flag == 0:
                 size = choice(RiverSize)
@@ -179,7 +181,7 @@ def generate(arr, i, j, t, flag=0):
             i, j = q[index]
             arr[i][j] = square(t.c)
             dx, dy = choice(c_moves)
-            if t.t == "water river":
+            if t.t2 == "water river":
                 height -= randint(300, 400)
             else:
                 height -= randint(-400, 400)
@@ -196,10 +198,10 @@ def generate(arr, i, j, t, flag=0):
                 (arr[i + moves[idx][0]][j + moves[idx][1]].t == "water lake" or\
                 arr[i + moves[idx][0]][j + moves[idx][1]].t == "sea water"):
                     print(1)
-                    return 0
+                    return q
             if (arr[q[-1][0]][q[-1][1]].t == 'water lake'):
-                return 0
-
+                return q
+ 
             if index % 29 == 0:
                 shuffle(q)
             index += 1
@@ -208,6 +210,7 @@ def generate(arr, i, j, t, flag=0):
 class terra:
     def __init__(self, SIZE):
     ##  
+        self.turn = 0
         self.coord = [0, 0]
         if type(SIZE) == list:
             self.area = SIZE
@@ -261,13 +264,19 @@ class terra:
     def go_to(self, x, y):
         self.objects[0].go_to(x, y)
     def look(self, obj=0):
-        if obj == 0:
-            obj = self.objects[0]
+        obj = self.objects[obj]
         arr = list(map(lambda a: (a.x, a.y), self.objects))
         i = 1
-        print("Here ", obj.x, obj.y, "There is", end = ' ')
+        print("Here ", obj.x, obj.y, "There", end = ' ')
         colored.colored_print(\
         self.area[obj.x][obj.y].info(), '\n', "dark_blue", 0, "gray", 1, [])
+        Arr = list(map(list, self.area[obj.x][obj.y].attributes.items()))
+
+        for i in range(len(Arr)):
+            colored.colored_print(Arr[i][0] + ' = ' + str(obj.get_amount(obj.x, obj.y, Arr[i][0])), ' '
+            ,"red", 0, "green", 1, [])
+            
+            
         print("Height = ", end = ' ')
         colored.colored_print(str(self.area[obj.x][obj.y].height),'\n',  \
         "green", 0, "gray", 1, [])
@@ -277,12 +286,11 @@ class terra:
      #   self.area[obj.x][obj.y].attributes = []
         for i in range(self.size):
             for j in range(self.size):
-                if self.area[i][j].t == 'water lake' or \
-                   self.area[i][j].t == 'water river':
+                if self.area[i][j].t2 == 'water lake' or \
+                   self.area[i][j].t2 == 'water river':
                     for dx, dy in moves:
-                        if 0 <= dx + i < self.size and 0 <= dy + j < self.size:
-                            self.area[i + dx][j + dy].attributes["water"] += 20
-
+                        if 0 <= dx + i < self.size and 0 <= dy + j < self.size and self.area[i + dx][j + dy].t2 not in water:
+                            self.area[i + dx][j + dy] = square(coast)
     def Print(self, obj):
         os.system("clear")
         x, y = obj.x, obj.y
@@ -327,24 +335,27 @@ while True:
         world.go_to(a, b)
         world.Print(world.objects[0])
     if s == 'up':
-        print(world.objects[0].move(-1, 0))
+        print(world.objects[0].move(-1, 0, flag=1))
         world.Print(world.objects[0]) 
         world.look()
 
     elif s == 'left':
-        print(world.objects[0].move(0, -1))
+        print(world.objects[0].move(0, -1, flag=1))
         world.Print(world.objects[0]) 
         world.look()
     elif s == 'right':
-        print(world.objects[0].move(0, 1))
+        print(world.objects[0].move(0, 1, flag=1))
         world.Print(world.objects[0]) 
         world.look()
     elif s == 'down':
-        print(world.objects[0].move(1, 0))
+        print(world.objects[0].move(1, 0, flag=1))
         world.Print(world.objects[0]) 
         world.look()
     elif s == 'look':
         world.look()
+    elif s == "look_at":
+        x, y = map(int, input().split())
+        print(world.area[x][y].info())
     elif s == "new":
         s = input().split()
         world.objects.append(objects.obj(s[0], world))
@@ -356,6 +367,7 @@ while True:
         t = 0
         while True:
         #len(world.objects) == l:
+            world.turn += 1
             for obj in world.objects[1:]:
                 obj.turn()
             #world.Print(world.objects[0])
@@ -364,9 +376,11 @@ while True:
                 print(t)
                 break
     elif s == "turn" or s == 't':
+        world.turn += 1
         for obj in world.objects[1:]:
             obj.turn()
         world.Print(world.objects[0])
+
         sys.stdout.flush()
         
         sys.stderr.flush()
@@ -375,4 +389,5 @@ while True:
         for i in range(1, len(world.objects)):
             obj = world.objects[i]
             print(i), obj.info()
-
+    elif s == "exit":
+        sys.exit()
