@@ -9,6 +9,9 @@ colored['@'] = ['@', '', "purpur", 0, 'black', 0, ["hard"]]
 names['M'] = "mammoth"
 names['X'] = "SightOfGod"
 names['@'] = "wolf"
+def change_energy(delta_height, type_a, type_b):
+    return 0
+
 class obj:
     def __init__(self, sym, world):
         self.c = sym
@@ -16,6 +19,7 @@ class obj:
         self.y = 0
         self.world = world
         self.name = names[sym]
+        self.energy = 0
 #    def remove(self):
 #        self.obj = None
 #All types should be possible on default
@@ -24,15 +28,18 @@ class obj:
             dx, dy = dx
         if (0 <= self.x + dx < self.world.size) and \
         (0 <= self.y + dy < self.world.size) and \
-        (self.world.area[self.x + dx][self.y + dy].t + self.world.area[self.x + dx][self.y + dy].t2 in Possible) and \
+        (self.world.area[self.x + dx][self.y + dy].get_name in Possible) and \
         self.world.area[self.x + dx][self.y + dy].obj == None:
             self.world.area[self.x][self.y].obj = None
             if not flag:
                 self.world.area[self.x][self.y].last_time = self.world.turn
+            self.energy -= change_energy(\
+            self.world.area[self.x + dx][self.y + dy].height - self.world.area[self.x][self.y].height,
+            self.world.area[self.x][self.y].get_name(), self.world.area[self.x + dx][self.y + dy].get_name())
             self.x += dx
             self.y += dy
-            print(Possible, self.world.area[self.x][self.y].t, self.world.area[self.x][self.y].t\
-            + self.world.area[self.x + dx][self.y + dy].t2 in Possible, sep = '\n')
+#            print(Possible, self.world.area[self.x][self.y].t, self.world.area[self.x][self.y].t\
+#            + self.world.area[self.x + dx][self.y + dy].t2 in Possible, sep = '\n')
             self.world.area[self.x][self.y].obj = self
             if not flag:
                 self.world.area[self.x][self.y].last_time = self.world.turn
@@ -61,9 +68,8 @@ class obj:
 
     def get_amount(self, i, j, obj):
         x = self.world.area[i][j].last_time
-        return int(-self.dist(i, j) * 1.5) + \
-        int((max_size[number[self.world.area[i][j].t +\
-        self.world.area[i][j].t2]][obj] - self.world.area[i][j].attributes[obj]) *\
+        return int(-self.dist(i, j) * 2) + \
+        int((max_size[number[self.world.area[i][j].get_name()]][obj] - self.world.area[i][j].attributes[obj]) *\
         (sums[min(7, max(0, (-x + self.world.turn - 2)))]) / 25) +\
         self.world.area[i][j].attributes[obj]
 

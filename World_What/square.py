@@ -85,7 +85,8 @@ class square:
 
 
         self.obj = None
-
+    def get_name(self):
+        return self.t + self.t2
     def __str__(self):
 #        if self.atr
         return str(self.c)

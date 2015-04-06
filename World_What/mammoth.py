@@ -40,7 +40,7 @@ class mammoth(objects.obj):
         return ans
     def  info(self):
         print("in point", self.x, self.y)
-        print("f = ", self.food, "w = " + str(self.water))
+        print("f = %d, w = %d, health = %d"%(self.food, self.water, self.hp))
         print(' '.join(map(str, self.last)))
 
 
@@ -167,7 +167,7 @@ class mammoth(objects.obj):
             if used[u] > rad:
                 return (False, (0, 0))
             i, j = u
-            if self.world.area[i][j].obj != None and self.world.area[i][j].obj.name != obj\
+            if self.world.area[i][j].obj != None and self.world.area[i][j].obj.name != obj and\
             self.world.area[i][j].obj.name != "SideOfGod":
                 return (True, (i, j))
             for dx, dy in all_directions:
@@ -233,7 +233,7 @@ class mammoth(objects.obj):
             else:
                 if len(self.last) != 0:
                     self.last[-1][1] -= 1
-                    if self.last[-1][1] == 0:
+                    if self.last[-1][1] <= 0:
                         self.last.pop()
             return 
                     
