@@ -2,7 +2,6 @@
 
 import helpers
 import relief
-from generate_mountains import generate_mountains
 from square import square
 from random import randint, sample
 from collections import deque
@@ -10,6 +9,8 @@ from polygons import random_polygon, is_point_in_polygon
 from polygons import do_segments_intersect
 from statusbar import statusbar
 from pnglib import watch_terra
+from generate_mountains import generate_mountains
+from generate_mountains import generate_line
 
 
 def point_triangle(p):
@@ -128,13 +129,14 @@ def some_magic(n, world, stat_bar):
 def generate_world(n):
     random_par = 0.16 * n
     res = [[square(chr(8776)) for i in range(n)] for j in range(n)]
-    _n = randint(2, 5)
+    _n = randint(2, 3)
     stat_bar = statusbar([
         ("Generating world shape", "Finished generating world shape"),
         ("Preparing to make world map", "Prepared to make world map"),
         ("Making world map", "Finished making world map")] * _n + [
         ("Doing some magic", "It was a kind of magic!"),
-        ("Destroying inland seas", "Destroyed inland seas")],
+        ("Destroying inland seas", "Destroyed inland seas")] + 
+        [("Creating mountains", "Mountains created")],
         clock_enabled=True,
         task_length = 30)
     stat_bar.Print()
@@ -148,4 +150,6 @@ def generate_world(n):
                 res[i][j] = square('"')
     some_magic(n, res, stat_bar)
     destroy_inland_seas(n, res, stat_bar)
-    return relief.terra(res)
+    res = relief.terra(res)
+    generate_mountains(res, stat_bar)
+    return res

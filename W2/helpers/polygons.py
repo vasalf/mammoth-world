@@ -83,9 +83,9 @@ class random_polygon:
 
     def __bsearch_segment_strong_intersection(self, a, b, y):
         l, r = self.ld[0], self.ru[0] + 1
-        while l < r + 1:
+        while l < r - 1:
             mid = (l + r) // 2
-            if do_segments_strongly_intersect(self, a, b, (mid, y), (self.ru[0] + 1, y)):
+            if do_segments_strongly_intersect(a, b, (mid, y), (self.ru[0] + 1, y)):
                 l = mid
             else:
                 r = mid

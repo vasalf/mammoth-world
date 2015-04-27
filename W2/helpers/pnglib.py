@@ -37,7 +37,18 @@ sea = [sea_bg * width] * width
 plain_bg = str_to_pix("FFCC00")
 plain = [plain_bg * width] * width
 mountain_bg = str_to_pix("FFFFFF")
-mountain = [mountain_bg * width] * width
+mountain_arr = [[mountain_bg for i in range(width)] for j in range(width)]
+mountain_fg = str_to_pix("000000")
+for i in range(width // 2 + 1):
+    mountain_arr[i][width // 2 - i] = mountain_fg
+    mountain_arr[i][width // 2 + i] = mountain_fg
+    for j in range(width // 2 - i):
+        mountain_arr[i][j] = plain_bg
+        mountain_arr[i][width - 1 - j] = plain_bg
+mountain = [[] for i in range(width)]
+for i in range(width):
+    for j in range(width):
+        mountain[i] += mountain_arr[i][j]
 
 
 def pixmap_to_pixlist(pixmap):

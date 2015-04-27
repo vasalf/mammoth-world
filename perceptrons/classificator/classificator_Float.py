@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from Float import Float
+
 
 class perceptron:
     def __init__(self, n):
@@ -8,23 +10,23 @@ class perceptron:
         
         # 1-weight edges
         for i in range(n):
-            self.__edges[(2 * i, 2 * n + i)] = 1
+            self.__edges[(2 * i, 2 * n + i)] = Float(1)
 
         # v-weight edges
         for i in range(n):
-            self.__edges[(2 * i + 1, 2 * n + i)] = 1
+            self.__edges[(2 * i + 1, 2 * n + i)] = Float(1)
 
         # lambda-weight edges
         for i in range(n):
-            self.__edges[(2 * n + i, 3 * n)] = 1
+            self.__edges[(2 * n + i, 3 * n)] = Float(1)
 
     def get_val(self, arr):
         n = self.__n
-        a_neurons_vals = [0 for i in range(self.__n)]
+        a_neurons_vals = [Float() for i in range(self.__n)]
         for i in range(self.__n):
             a_neurons_vals[i] += arr[i] * self.__edges[(2 * i, 2 * n + i)]
             a_neurons_vals[i] += (-1) * self.__edges[(2 * i + 1, 2 * n + i)]
-        res = 0
+        res = Float()
         for i in range(self.__n):
             res += a_neurons_vals[i] * self.__edges[(2 * n + i, 3 * n)]
         return 1 if res > 0 else -1
@@ -36,7 +38,7 @@ class perceptron:
             return
         else:
             for i in range(n):
-                x = ans * arr[i]
+                x = ans * Float(arr[i])
                 self.__edges[(2 * n + i, 3 * n)] += x
                 lambdas = self.__edges[(2 * n + i, 3 * n)]
                 v = self.__edges[(2 * i + 1, 2 * n + i)]

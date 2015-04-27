@@ -160,7 +160,7 @@ def interact_with_user(terra_generator):
             for obj in world.objects[1:]:
                 obj.turn(world)
             world.Print(world.objects[0])
-        elif s == "infinity_turns":
+        elif s == "it":
             while True:
                 for obj in world.objects[1:]:
                     obj.turn(world)
