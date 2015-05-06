@@ -9,7 +9,10 @@ import os
 from time import clock
 import objects
 import mammoth
+import copy
 from time import sleep
+
+
 sys.setrecursionlimit(100000)
 SIZE = 80
 obj_big = 30
@@ -208,9 +211,14 @@ def generate(arr, i, j, t, flag=0):
         return q
 
 class terra:
+    
     def __init__(self, SIZE):
-    ##  
-        self.turn = 0
+        self.area = [[square(0)] * SIZE for i in range(SIZE)]
+        self.size = SIZE
+        self.Turn = [0]
+        point = objects.obj('X', self, 0, 0, self.area)
+        self.objects = [point]
+        self.t = 25
         self.coord = [0, 0]
         if type(SIZE) == list:
             self.area = SIZE
@@ -218,17 +226,16 @@ class terra:
             return 
    ##
         self.log = []
-        self.size = SIZE
+        
         global obj_small
         obj_small = int(SIZE ** (1.5) // 10)
         global obj_big
         obj_big = SIZE // 5
         global obj_large
         obj_large = int(SIZE ** 0.5 / 2)
-        self.area = [[square(0)] * SIZE for i in range(SIZE)]
-        point = objects.obj('X', self)
-        self.objects = [point]
-        self.t = 25
+        
+        
+        
         for i in range(SIZE):
             for j in range(SIZE):
                 if self.area[i][j].c == "":
@@ -317,6 +324,18 @@ class terra:
         world.log = []
         return '\n'
       
+      
+def upgrade(obj, world):
+    if obj.hp <= 0:
+        world.objects.pop(world.objects.index(obj))
+        return
+    rad, x, y = obj.v_rad, obj.x, obj.y
+    for dx in range(-rad, rad + 1):
+        for dy in range(-rad + abs(dx), rad - abs(dx) + 1):
+            if (0 <= x + dx < obj.world.size()) and \
+(0 <= y + dy < obj.world.size()):
+                obj.memory[(x + dx, y + dy)] = copy.deepcopy(world.area[x + dx][y + dy]) 
+                
 print("\033[31mType Size of the World\033[0m\n")
 clock()
 world = terra(int(input()))
@@ -324,10 +343,16 @@ world = terra(int(input()))
 print("New World is created, time is %f\n"%(clock()))
 #==================
 #MAMMOTH GENERATION
-for new_mammoth in mammoth.generate_mammoth_herds(world):
+a =  mammoth.generate_mammoth_herds(world)
+i = 0
+print("Mammoths generating first finishing, time is %f\n"%clock())
+for new_mammoth in a:
+    print(i)
+    i += 1
     world.objects.append(new_mammoth)
-print("Mammoths generated, time is %f\n"%clock())
+    upgrade(new_mammoth, world)
 #==================
+print("Mammoths generating second finishing, time is %f\n"%clock())
 while True:
     s = input()
     if s == 'go_to':
@@ -367,18 +392,21 @@ while True:
         t = 0
         while True:
         #len(world.objects) == l:
-            world.turn += 1
+            world.Turn[0] += 1
             for obj in world.objects[1:]:
-                obj.turn()
+                obj.turn(world.area[obj.x][obj.y])
+                upgrade(obj, world)
+
             #world.Print(world.objects[0])
             t += 1
             if len(world.objects) == 1:
                 print(t)
                 break
     elif s == "turn" or s == 't':
-        world.turn += 1
+        world.Turn[0] += 1
         for obj in world.objects[1:]:
-            obj.turn()
+            obj.turn(world.area[obj.x][obj.y])
+            upgrade(obj, world)
         world.Print(world.objects[0])
 
         sys.stdout.flush()
