@@ -1,3 +1,6 @@
+import copy
+
+
 moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]
 grass = '`'
 swamp = ';'
@@ -44,6 +47,12 @@ max_size[9]["water"] = 90
 max_size[9]["M-food"] = 0
 class square:
     def __init__(self, typ):
+        self.obj = None
+        if type(typ) == square:
+            self.t, self.t2, self.height = typ.t, typ.t2, typ.height
+            self.attributes = copy.deepcopy(typ.attributes)
+            self.last_time = typ.last_time
+            return
         self.c = typ if typ != 0 else ''
         self.t = 'ground'
         self.t2 = ''
@@ -84,7 +93,6 @@ class square:
         self.last_time = 0
 
 
-        self.obj = None
     def get_name(self):
         return self.t + self.t2
     def __str__(self):
@@ -98,4 +106,10 @@ class square:
         return "last mammonth was in %d\n You can see %s, "%((self.last_time, self.t)) + (self.t2 + ', ') * bool(self.t2) + \
                ', '.join(map(str, self.attributes.items())).rstrip(', ') + \
                ((', ' + str(self.obj)) if self.obj != None else '')
- 
+    
+    def copy(self):
+        res = square(self)
+        if res.obj != None:
+            res.obj = self.obj.copy()
+        return res 
+

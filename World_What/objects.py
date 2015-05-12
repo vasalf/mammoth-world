@@ -52,7 +52,7 @@ class obj:
         if (0 <= self.x + dx < self.world.size()) and \
         (0 <= self.y + dy < self.world.size()) and \
         (self.memory[(self.x + dx, self.y + dy)].get_name() in Possible) and \
-        self.memory[(self.x + dx, self.y + dy)].obj == None:
+         self.memory[(self.x + dx, self.y + dy)].obj == None:
             self.memory[(self.x, self.y)].obj = None
             if not flag:
                 self.memory[(self.x, self.y)].last_time = self.world.turn()
@@ -62,13 +62,21 @@ class obj:
             self.x += dx
             self.y += dy
             
-#            print(Possible, self.memory[self.x, self.y].t, self.memory[self.x, self.y].t\
-#            + self.memory[self.x + dx, self.y + dy].t2 in Possible, sep = '\n')
+            #print(Possible, self.memory[self.x, self.y].t, self.memory[self.x, self.y].t\
+            #+ self.memory[self.x + dx, self.y + dy].t2 in Possible, sep = '\n')
             self.memory[self.x, self.y].obj = self
             if not flag:
                 self.memory[self.x, self.y].last_time = self.world.turn()
             return True
         return False
+
+    def copy(self):
+        
+        res = copy.copy(self)
+        res.memory = {}
+        print(len(self.memory.keys()))
+        return res
+
 
     def turn(self):
         pass
@@ -82,7 +90,7 @@ class obj:
         mx = self.memory[x, y].attributes[obj]
         res = (x, y)
         for u in q:
-            if used[u] > rad:
+            if used[u] >= rad:
                 continue
             i, j = u
             if self.get_amount(i, j, obj) > mx and self.memory[i, j].t in Passable:
@@ -130,7 +138,7 @@ class obj:
         used[(x, y)] = 0
         q = [(x, y)]
         for u in q:
-            if used[u] > rad:
+            if used[u] >= rad:
                 return (False, (0, 0))
             i, j = u
             if self.memory[i, j].obj != None and self.memory[i, j].obj.name != obj and\

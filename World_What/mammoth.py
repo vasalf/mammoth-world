@@ -5,7 +5,7 @@ from collections import defaultdict
 Passable = {'meadle', 'coast', 'grass', 'swamp', 'ground', 'tree', ""}
 Herds = []
 all_directions = [(0,1),(1,0),(-1,0),(0,-1)]
-max_hp = 10
+max_hp = 30
 class mammothHerd():
     
     def __init__(self):
@@ -51,7 +51,7 @@ class mammoth(objects.obj):
         #for direction in all_directions:
             #if self.move(direction, 0, Passable):
                 #return True
-        print("OMG I AM STUCK")
+        #print("OMG I AM STUCK")
         return False
 
     def move_to(self, x, y):
@@ -155,18 +155,18 @@ class mammoth(objects.obj):
         if self.water <= 0:
             self.hp -= 1
         if self.food >= 25 and self.water >= 25:
-            self.hp += randint(3, 5)
+            self.hp = min(max_hp, randint(3, 5) + self.hp)
 
         if self.food <= 6 and self.water <= 6:
             mx = 0
             res = [0, 0]
             for dx, dy in all_directions:
-                if self.world.area[self.x + dx, self.y + dy].attributes["M-food"] + \
-                self.world.area[self.x + dx, self.y + dy].attributes["water"] > mx + 5 and \
-                self.world.area[self.x + dx, self.y + dy].t in Passable:
+                if self.memory[self.x + dx, self.y + dy].attributes["M-food"] + \
+                self.memory[self.x + dx, self.y + dy].attributes["water"] > mx + 5 and \
+                self.memory[self.x + dx, self.y + dy].t in Passable:
                     res = dx, dy
-                    mx = self.world.area[self.x + dx, self.y + dy].attributes["M-food"] + \
-                    self.world.area[self.x + dx, self.y + dy].attributes["water"] 
+                    mx = self.memory[self.x + dx, self.y + dy].attributes["M-food"] + \
+                    self.memory[self.x + dx, self.y + dy].attributes["water"] 
             self.move(res[0], res[1], Passable)
             self.eatNdrink(square)
         
@@ -275,7 +275,7 @@ def create_mammoth(world, x, y, herdID, oldest):
     if (world.area[x][y].obj != None or (world.area[x][y].t2 not in Passable)):
         return 0, False
         
-    new = mammoth(world, herdID, x, y, True if oldest else False, randint(75, 95) if oldest else randint(0, 74))
+    new = mammoth(world, herdID, x, y, True if oldest else False, -randint(75, 95) if oldest else -randint(0, 74))
     world.area[x][y].obj = new
     return new, True
 

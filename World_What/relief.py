@@ -334,7 +334,7 @@ def upgrade(obj, world):
         for dy in range(-rad + abs(dx), rad - abs(dx) + 1):
             if (0 <= x + dx < obj.world.size()) and \
 (0 <= y + dy < obj.world.size()):
-                obj.memory[(x + dx, y + dy)] = copy.deepcopy(world.area[x + dx][y + dy]) 
+                obj.memory[(x + dx, y + dy)] = (world.area[x + dx][y + dy]).copy()
                 
 print("\033[31mType Size of the World\033[0m\n")
 clock()
@@ -359,20 +359,20 @@ while True:
         a, b = map(int, input().split())
         world.go_to(a, b)
         world.Print(world.objects[0])
-    if s == 'up':
+    if s == 'up' or s == '^[[A':
         print(world.objects[0].move(-1, 0, flag=1))
         world.Print(world.objects[0]) 
         world.look()
 
-    elif s == 'left':
+    elif s == 'left' or s == '^[[D':
         print(world.objects[0].move(0, -1, flag=1))
         world.Print(world.objects[0]) 
         world.look()
-    elif s == 'right':
+    elif s == 'right' or s == '^[[C':
         print(world.objects[0].move(0, 1, flag=1))
         world.Print(world.objects[0]) 
         world.look()
-    elif s == 'down':
+    elif s == 'down' or s == '^[[B':
         print(world.objects[0].move(1, 0, flag=1))
         world.Print(world.objects[0]) 
         world.look()
@@ -395,8 +395,8 @@ while True:
             world.Turn[0] += 1
             for obj in world.objects[1:]:
                 obj.turn(world.area[obj.x][obj.y])
+            for obj in world.objects[1:]:         
                 upgrade(obj, world)
-
             #world.Print(world.objects[0])
             t += 1
             if len(world.objects) == 1:
@@ -405,7 +405,8 @@ while True:
     elif s == "turn" or s == 't':
         world.Turn[0] += 1
         for obj in world.objects[1:]:
-            obj.turn(world.area[obj.x][obj.y])
+            obj.turn(world.area[obj.x][obj.y])       
+        for obj in world.objects[1:]:
             upgrade(obj, world)
         world.Print(world.objects[0])
 
